@@ -1,19 +1,28 @@
 import time
-import systemd.daemon
+import cysystemd.daemon as daemon
 import inject
 from hydro_iot.controller.interface.scheduler import IScheduler
-from hydro_iot.controller.config import load_config
+from hydro_iot.controller.config import IConfig
+from hydro_iot.usecase.interface.message_queue import IMessageQueueGateway
+from hydro_iot.usecase.read_temperature import read_temperature
 
 
 @inject.autoparams()
-def start_service(scheduler: IScheduler):
+def start_service(
+    scheduler: IScheduler, config: IConfig, message_queue: IMessageQueueGateway
+):
     print("Starting up ...")
     print("Startup complete")
     # Tell systemd that our service is ready
-    systemd.daemon.notify("READY=1")
+    daemon.notify(daemon.Notification.READY)
 
-    config = load_config()
-
-    # scheduler.repeat_job_at_interval(check_ph_ec_usecase, seconds=config.timings.check_ph_ex_interval)
+    scheduler.repeat_job_at_interval(
+        func=read_temperature,
+        seconds=config.timings.check_temperature_interval,
+        id="check_temperature",
+    )
 
     scheduler.start()
+
+    message_queue.declare_listener("commands", "user123.*", lambda a, b, c, d: print(a))
+    message_queue.start_listening()

@@ -13,7 +13,7 @@ class APScheduler(IScheduler):
         self._scheduler.shutdown()
 
     def repeat_job_at_interval(self, func: Callable, seconds: float, id: str) -> str:
-        self._scheduler.add_job(func, "interval", seconds=seconds)
+        self._scheduler.add_job(func, "interval", seconds=seconds, id=id)
 
     def change_job_schedule(self, id: str, seconds: float) -> None:
         self._scheduler.reschedule_job(id, trigger="interval", seconds=seconds)

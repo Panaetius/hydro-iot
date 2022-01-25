@@ -1,20 +1,17 @@
 from dataclasses import dataclass
-import dataconf
 
 
 @dataclass
 class Timings:
-    check_ph_ex_interval: float
+    check_ph_ex_interval: int
+    check_temperature_interval: int
+
+
+class IMessageQueueConnectionInfo:
+    pass
 
 
 @dataclass
-class Config:
+class IConfig:
     timings: Timings
-
-
-def load_config() -> Config:
-    return dataconf.load("/etc/hydro-iot/hydro-iot.conf", Config)
-
-
-def save_config(config: Config):
-    dataconf.dump("/etc/hydro-iot/hydro-iot.conf", config, out="properties")
+    message_queue_connection: IMessageQueueConnectionInfo
