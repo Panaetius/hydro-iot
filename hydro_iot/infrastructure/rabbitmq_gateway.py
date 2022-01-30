@@ -1,12 +1,16 @@
 from typing import Callable
-from hydro_iot.usecase.interface.message_queue import IMessageQueueGateway
-from hydro_iot.controller.config import IConfig
 
-import pika
 import inject
+import pika
+
+from hydro_iot.controller.config import IConfig
+from hydro_iot.services.ports.message_queue import (
+    IMessageQueuePublisher,
+    IMessageQueueSubscriber,
+)
 
 
-class RabbitMQGateway(IMessageQueueGateway):
+class RabbitMQGateway(IMessageQueuePublisher):
     config: IConfig = inject.attr(IConfig)
 
     def __init__(self) -> None:
@@ -19,17 +23,17 @@ class RabbitMQGateway(IMessageQueueGateway):
         )
         self.channels = dict()
 
-    def send_message(self, key: str, body: str) -> None:
-        pass
+    # def send_message(self, key: str, body: str) -> None:
+    #     pass
 
-    def declare_listener(self, queue: str, key: str, callback: Callable):
-        self.channels[(queue, key)] = callback
+    # def declare_listener(self, queue: str, key: str, callback: Callable):
+    #     self.channels[(queue, key)] = callback
 
-    def start_listening(self):
-        try:
-            self.connection.ioloop.start()
-        except KeyboardInterrupt:
-            self.connection.close()
+    # def start_listening(self):
+    #     try:
+    #         self.connection.ioloop.start()
+    #     except KeyboardInterrupt:
+    #         self.connection.close()
 
     def _open_callback(self, connection):
         for (queue, key), callback in self.channels.items():

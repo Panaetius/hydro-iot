@@ -1,6 +1,6 @@
-from hydro_iot.usecase.interface.sensors_gateway import ISensorGateway
-
 from pi1wire import Pi1Wire
+
+from hydro_iot.services.ports.sensors_gateway import ISensorGateway
 
 
 class RaspberrySensorGateway(ISensorGateway):

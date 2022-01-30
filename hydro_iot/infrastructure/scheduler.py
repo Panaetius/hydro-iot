@@ -1,6 +1,8 @@
-from hydro_iot.controller.interface.scheduler import IScheduler
-from apscheduler.schedulers.background import BackgroundScheduler
 from typing import Callable
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+from hydro_iot.controller.interface.scheduler import IScheduler
 
 
 class APScheduler(IScheduler):

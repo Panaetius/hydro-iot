@@ -1,5 +1,7 @@
 from dataclasses import dataclass
+
 import dataconf
+
 from hydro_iot.controller.config import IConfig, IMessageQueueConnectionInfo
 
 

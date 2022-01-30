@@ -1,15 +1,20 @@
 import time
+
 import cysystemd.daemon as daemon
 import inject
-from hydro_iot.controller.interface.scheduler import IScheduler
+
 from hydro_iot.controller.config import IConfig
-from hydro_iot.usecase.interface.message_queue import IMessageQueueGateway
-from hydro_iot.usecase.read_temperature import read_temperature
+from hydro_iot.controller.interface.scheduler import IScheduler
+from hydro_iot.infrastructure.dummy_message_queue import DummyMQGateway
+from hydro_iot.services.ports.message_queue import IMessageQueueSubscriber
+from hydro_iot.services.read_temperature import read_temperature
 
 
 @inject.autoparams()
 def start_service(
-    scheduler: IScheduler, config: IConfig, message_queue: IMessageQueueGateway
+    scheduler: IScheduler,
+    config: IConfig,
+    message_queue_subscriber: IMessageQueueSubscriber,
 ):
     print("Starting up ...")
     print("Startup complete")
@@ -24,5 +29,40 @@ def start_service(
 
     scheduler.start()
 
-    message_queue.declare_listener("commands", "user123.*", lambda a, b, c, d: print(a))
+    message_queue = DummyMQGateway()
+    message_queue.declare_listener(
+        "commands",
+        "user123.set_minimum_ph",
+        message_queue_subscriber.set_minimum_ph_level,
+    )
+    message_queue.declare_listener(
+        "commands",
+        "user123.set_maximum_ph_level",
+        message_queue_subscriber.set_maximum_ph_level,
+    )
+    message_queue.declare_listener(
+        "commands",
+        "user123.set_minimum_conductivity_level",
+        message_queue_subscriber.set_minimum_conductivity_level,
+    )
+    message_queue.declare_listener(
+        "commands",
+        "user123.set_maximum_conductivity_level",
+        message_queue_subscriber.set_maximum_conductivity_level,
+    )
+    message_queue.declare_listener(
+        "commands",
+        "user123.set_minimum_pump_pressure",
+        message_queue_subscriber.set_minimum_pump_pressure,
+    )
+    message_queue.declare_listener(
+        "commands",
+        "user123.set_target_pump_pressure",
+        message_queue_subscriber.set_target_pump_pressure,
+    )
+    message_queue.declare_listener(
+        "commands",
+        "user123.set_spray_timing",
+        message_queue_subscriber.set_spray_timing,
+    )
     message_queue.start_listening()

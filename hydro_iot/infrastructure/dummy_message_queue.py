@@ -1,9 +1,13 @@
-from typing import Callable
-from hydro_iot.usecase.interface.message_queue import IMessageQueueGateway
 from time import sleep
+from typing import Callable
+
+from hydro_iot.services.ports.message_queue import (
+    IMessageQueuePublisher,
+    IMessageQueueSubscriber,
+)
 
 
-class DummyMQGateway(IMessageQueueGateway):
+class DummyMQGateway(IMessageQueuePublisher):
     def __init__(self) -> None:
         self.channels = dict()
 
