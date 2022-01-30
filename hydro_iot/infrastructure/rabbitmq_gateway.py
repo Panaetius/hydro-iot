@@ -3,7 +3,7 @@ from typing import Callable
 import inject
 import pika
 
-from hydro_iot.controller.config import IConfig
+from hydro_iot.domain.config import IConfig
 from hydro_iot.services.ports.message_queue import (
     IMessageQueuePublisher,
     IMessageQueueSubscriber,
@@ -40,6 +40,4 @@ class RabbitMQGateway(IMessageQueuePublisher):
             channel = connection.channel()
             channel.queue_declare(queue)
             channel.queue_bind(queue=queue, routing_key=key)
-            channel.basic_consume(
-                queue=queue, on_message_callback=callback, auto_ack=True
-            )
+            channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True)

@@ -1,0 +1,27 @@
+timings {
+    check_ph_ex_interval_ms = 5
+    check_temperature_interval_ms = 5
+    spray_box_timings_ms = [
+        750,
+        750,
+        750
+    ]
+}
+
+message_queue_connection {
+    host = localhost
+    port = 1234
+}
+
+pins {
+    tds_sensor_adc_pin = 0
+    ph_sensor_adc_pin = 1
+    pressure_adc_sensor_pin = 2
+    tds_power_gpio_pin = 5  # Pin 29
+    ph_power_gpio_pin = 6   # Pin 31
+    box_spray_pins = [
+        12,
+        13,
+        16
+    ]
+}

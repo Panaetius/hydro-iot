@@ -18,6 +18,12 @@ class IMessageQueuePublisher(ABC):
     def send_fertilizer_level(self, ec: Conductivity):
         raise NotImplementedError()
 
+    def send_pressure_status(self, pressure: Pressure):
+        raise NotImplementedError()
+
+    def send_spray_message(self, num_boxes: int):
+        raise NotImplementedError()
+
 
 class IMessageQueueSubscriber(ABC):
     def set_minimum_ph_level(self, ph: PH):
