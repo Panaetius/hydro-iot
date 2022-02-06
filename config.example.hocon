@@ -38,7 +38,7 @@ pins {
     ph_sensor_adc = 5
     pressure_adc_sensor = 8
     tds_power_gpio = 10
-    ph_power_gpio = 13
+    ph_power_gpio = 40
     pressure_pump= 15
     flora_grow_pump = 16
     flora_micro_pump = 27

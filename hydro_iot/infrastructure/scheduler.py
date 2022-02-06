@@ -6,7 +6,7 @@ from hydro_iot.controller.interface.scheduler import IScheduler
 
 
 class APScheduler(IScheduler):
-    _scheduler = BackgroundScheduler()
+    _scheduler = BackgroundScheduler({"apscheduler.job_defaults.max_instances": 10})
 
     def start(self) -> None:
         self._scheduler.start()

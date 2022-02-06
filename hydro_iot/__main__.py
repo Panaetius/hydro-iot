@@ -1,6 +1,7 @@
 from time import monotonic
 
 import inject
+import RPi.GPIO as GPIO
 
 from hydro_iot.controller.interface.scheduler import IScheduler
 from hydro_iot.controller.service import start_service
@@ -43,4 +44,7 @@ def config(binder):
 
 inject.configure(config)
 
-start_service()
+try:
+    start_service()
+finally:
+    GPIO.cleanup()
