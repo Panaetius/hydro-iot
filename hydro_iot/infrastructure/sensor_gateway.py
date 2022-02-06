@@ -16,7 +16,7 @@ from hydro_iot.services.ports.sensors_gateway import ISensorGateway
 class RaspberrySensorGateway(ISensorGateway):
     def __init__(self) -> None:
         self.config = inject.instance(IConfig)
-        GPIO.setmode(GPIO.BOARD)
+        GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.config.pins.ph_power_gpio, GPIO.OUT)
         GPIO.setup(self.config.pins.tds_power_gpio, GPIO.OUT)
 

@@ -37,17 +37,17 @@ pins {
     tds_sensor_adc = 0
     ph_sensor_adc = 1
     pressure_adc_sensor = 2
-    tds_power_gpio = 7  # Pin 29
-    ph_power_gpio = 11   # Pin 31
-    pressure_pump= 13
-    flora_grow_pump = 15
-    flora_micro_pump = 12
-    flora_bloom_pump = 16
-    ph_up_pump = 18
-    ph_down_pump = 22
+    tds_power_gpio = 4
+    ph_power_gpio = 17
+    pressure_pump= 27
+    flora_grow_pump = 22
+    flora_micro_pump = 18
+    flora_bloom_pump = 23
+    ph_up_pump = 24
+    ph_down_pump = 25
     box_spray_pins = [
-        8,
-        10,
-        5
+        14,
+        15,
+        3
     ]
 }
