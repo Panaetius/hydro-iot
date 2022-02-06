@@ -17,8 +17,8 @@ class RaspberrySensorGateway(ISensorGateway):
     def __init__(self) -> None:
         self.config = inject.instance(IConfig)
         GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(config.pins.ph_power_gpio_pin, GPIO.OUT)
-        GPIO.setup(config.pins.tds_power_gpio_pin, GPIO.OUT)
+        GPIO.setup(self.config.pins.ph_power_gpio, GPIO.OUT)
+        GPIO.setup(self.config.pins.tds_power_gpio, GPIO.OUT)
 
         self._adc = ADS1263.ADS1263()
         self._ref = 5.08
@@ -35,13 +35,11 @@ class RaspberrySensorGateway(ISensorGateway):
         return WaterTemperature(value=sensor.get_temperature())
 
     def get_conductivity(self) -> Conductivity:
-        config = inject.instance(IConfig)
-
-        GPIO.output(config.pins.tds_power_gpio, GPIO.HIGH)
+        GPIO.output(self.config.pins.tds_power_gpio, GPIO.HIGH)
         sleep(0.5)
         values = []
         for _ in range(10):
-            result = self._adc.ADS1263_GetChannalValue(config.pins.tds_sensor_adc)
+            result = self._adc.ADS1263_GetChannalValue(self.config.pins.tds_sensor_adc)
 
             if result >> 31 == 1:
                 result = -1 * (self._ref * 2 - result * self._ref / 0x800000)
@@ -51,7 +49,7 @@ class RaspberrySensorGateway(ISensorGateway):
             values.append(result)
             sleep(0.05)
 
-        GPIO.output(config.pins.tds_power_gpio, GPIO.LOW)
+        GPIO.output(self.config.pins.tds_power_gpio, GPIO.LOW)
 
         value = sum(values) / 10.0
 
@@ -64,13 +62,11 @@ class RaspberrySensorGateway(ISensorGateway):
         return Conductivity(microsiemens_per_meter=ms)
 
     def get_ph(self) -> PH:
-        config = inject.instance(IConfig)
-
-        GPIO.output(config.pins.ph_power_gpio, GPIO.HIGH)
+        GPIO.output(self.config.pins.ph_power_gpio, GPIO.HIGH)
         sleep(0.5)
         values = []
         for _ in range(10):
-            result = self._adc.ADS1263_GetChannalValue(config.pins.ph_sensor_adc)
+            result = self._adc.ADS1263_GetChannalValue(self.config.pins.ph_sensor_adc)
 
             if result >> 31 == 1:
                 result = -1 * (self._ref * 2 - result * self._ref / 0x800000)
@@ -80,7 +76,7 @@ class RaspberrySensorGateway(ISensorGateway):
             values.append(result)
             sleep(0.05)
 
-        GPIO.output(config.pins.ph_power_gpio, GPIO.LOW)
+        GPIO.output(self.config.pins.ph_power_gpio, GPIO.LOW)
 
         value = sum(values) / 10.0
 
@@ -91,11 +87,9 @@ class RaspberrySensorGateway(ISensorGateway):
         return PH(value=ph_value)
 
     def get_pressure(self) -> Pressure:
-        config = inject.instance(IConfig)
-
         values = []
         for _ in range(5):
-            result = self._adc.ADS1263_GetChannalValue(config.pins.pressure_adc_sensor)
+            result = self._adc.ADS1263_GetChannalValue(self.config.pins.pressure_adc_sensor)
 
             if result >> 31 == 1:
                 result = -1 * (self._ref * 2 - result * self._ref / 0x800000)
