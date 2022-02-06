@@ -21,6 +21,9 @@ class RaspberrySensorGateway(ISensorGateway):
         GPIO.setup(self.config.pins.tds_power_gpio, GPIO.OUT)
 
         self._adc = ADS1263.ADS1263()
+        self._adc.ADS1263_init_ADC1("ADS1263_7200SPS")
+        self._adc.ADS1263_SetMode(0)
+
         self._ref = 5.08
         self._neutral_ph_voltage = 1500.0
         self._acid_ph_voltage = 2032.44
