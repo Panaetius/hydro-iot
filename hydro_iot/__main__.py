@@ -32,7 +32,7 @@ def config(binder):
     )
     binder.bind_to_constructor(IEventHub, lambda: AsyncioEventHub())
 
-    config_path = "config.example.conf"
+    config_path = "config.example.hocon"
     binder.bind("config_path", config_path)
     binder.bind_to_constructor(IConfig, lambda: Config.load_config(config_path))
 
