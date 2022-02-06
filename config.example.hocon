@@ -34,20 +34,20 @@ message_queue_connection {
 }
 
 pins {
-    tds_sensor_adc = 0
-    ph_sensor_adc = 1
-    pressure_adc_sensor = 2
-    tds_power_gpio = 4
-    ph_power_gpio = 17
-    pressure_pump= 27
-    flora_grow_pump = 22
-    flora_micro_pump = 18
-    flora_bloom_pump = 23
-    ph_up_pump = 24
-    ph_down_pump = 25
+    tds_sensor_adc = 2
+    ph_sensor_adc = 3
+    pressure_adc_sensor = 14
+    tds_power_gpio = 15
+    ph_power_gpio = 27
+    pressure_pump= 23
+    flora_grow_pump = 24
+    flora_micro_pump = 25
+    flora_bloom_pump = 8
+    ph_up_pump = 7
+    ph_down_pump = 5
     box_spray_pins = [
-        14,
-        15,
-        3
+        6,
+        12,
+        13
     ]
 }
