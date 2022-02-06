@@ -37,11 +37,11 @@ class RaspberrySensorGateway(ISensorGateway):
     def get_conductivity(self) -> Conductivity:
         config = inject.instance(IConfig)
 
-        GPIO.output(config.pins.tds_power_gpio_pin, GPIO.HIGH)
+        GPIO.output(config.pins.tds_power_gpio, GPIO.HIGH)
         sleep(0.5)
         values = []
         for _ in range(10):
-            result = self._adc.ADS1263_GetChannalValue(config.pins.tds_sensor_adc_pin)
+            result = self._adc.ADS1263_GetChannalValue(config.pins.tds_sensor_adc)
 
             if result >> 31 == 1:
                 result = -1 * (self._ref * 2 - result * self._ref / 0x800000)
@@ -51,7 +51,7 @@ class RaspberrySensorGateway(ISensorGateway):
             values.append(result)
             sleep(0.05)
 
-        GPIO.output(config.pins.tds_power_gpio_pin, GPIO.LOW)
+        GPIO.output(config.pins.tds_power_gpio, GPIO.LOW)
 
         value = sum(values) / 10.0
 
@@ -66,11 +66,11 @@ class RaspberrySensorGateway(ISensorGateway):
     def get_ph(self) -> PH:
         config = inject.instance(IConfig)
 
-        GPIO.output(config.pins.ph_power_gpio_pin, GPIO.HIGH)
+        GPIO.output(config.pins.ph_power_gpio, GPIO.HIGH)
         sleep(0.5)
         values = []
         for _ in range(10):
-            result = self._adc.ADS1263_GetChannalValue(config.pins.ph_sensor_adc_pin)
+            result = self._adc.ADS1263_GetChannalValue(config.pins.ph_sensor_adc)
 
             if result >> 31 == 1:
                 result = -1 * (self._ref * 2 - result * self._ref / 0x800000)
@@ -80,7 +80,7 @@ class RaspberrySensorGateway(ISensorGateway):
             values.append(result)
             sleep(0.05)
 
-        GPIO.output(config.pins.ph_power_gpio_pin, GPIO.LOW)
+        GPIO.output(config.pins.ph_power_gpio, GPIO.LOW)
 
         value = sum(values) / 10.0
 
@@ -95,7 +95,7 @@ class RaspberrySensorGateway(ISensorGateway):
 
         values = []
         for _ in range(5):
-            result = self._adc.ADS1263_GetChannalValue(config.pins.pressure_adc_sensor_pin)
+            result = self._adc.ADS1263_GetChannalValue(config.pins.pressure_adc_sensor)
 
             if result >> 31 == 1:
                 result = -1 * (self._ref * 2 - result * self._ref / 0x800000)

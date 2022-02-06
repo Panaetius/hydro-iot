@@ -18,5 +18,4 @@ class DummyMQGateway(IMessageQueuePublisher):
         self.channels[(queue, key)] = callback
 
     def start_listening(self):
-        while True:
-            sleep(5)
+        return

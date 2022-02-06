@@ -1,0 +1,81 @@
+from time import monotonic
+
+import inject
+
+from hydro_iot.domain.config import IConfig
+from hydro_iot.domain.system_state import SystemState
+from hydro_iot.services.ports.event_queue import IEventHub
+from hydro_iot.services.ports.message_queue import IMessageQueuePublisher
+from hydro_iot.services.ports.pump_gateway import IPumpGateway
+
+
+@inject.autoparams()
+def increase_ph(
+    system_state: SystemState, pump_gateway: IPumpGateway, message_queue: IMessageQueuePublisher, config: IConfig
+):
+    system_state.last_fertilizer_ph_adjustment = monotonic()
+    pump_gateway.raise_ph(config.amounts.ph_increase_ml)
+    message_queue.send_ph_raised(amount=config.amounts.ph_increase_ml)
+
+
+@inject.autoparams()
+def decrease_ph(
+    system_state: SystemState, pump_gateway: IPumpGateway, message_queue: IMessageQueuePublisher, config: IConfig
+):
+    system_state.last_fertilizer_ph_adjustment = monotonic()
+    pump_gateway.lower_ph(config.amounts.ph_decrease_ml)
+    message_queue.send_ph_lowered(amount=config.amounts.ph_increase_ml)
+
+
+@inject.autoparams()
+def increase_ec(
+    system_state: SystemState, pump_gateway: IPumpGateway, message_queue: IMessageQueuePublisher, config: IConfig
+):
+    system_state.last_fertilizer_ph_adjustment = monotonic()
+    pump_gateway.increase_fertilizer(
+        flora_grow_ml=config.amounts.flora_grow_ml,
+        flora_micro_ml=config.amounts.flora_micro_ml,
+        flora_bloom_ml=config.amounts.flora_bloom_ml,
+    )
+    message_queue.send_ec_increased(
+        amount_grow=config.amounts.flora_grow_ml,
+        amount_micro=config.amounts.flora_micro_ml,
+        amount_bloom=config.amounts.flora_bloom_ml,
+    )
+
+
+@inject.autoparams()
+def decrease_ec(
+    system_state: SystemState, pump_gateway: IPumpGateway, message_queue: IMessageQueuePublisher, config: IConfig
+):
+    system_state.last_fertilizer_ph_adjustment = monotonic()
+    pump_gateway.lower_fertilizer(amount_ml=config.amounts.fresh_water_ml)
+    message_queue.send_ec_lowered(amount=config.amounts.fresh_water_ml)
+
+
+@inject.autoparams()
+async def increase_ph_listener(eventhub: IEventHub):
+    with eventhub.subscribe("ph.up") as queue:
+        _ = await queue.get()
+        increase_ph()
+
+
+@inject.autoparams()
+async def decrease_ph_listener(eventhub: IEventHub):
+    with eventhub.subscribe("ph.down") as queue:
+        _ = await queue.get()
+        decrease_ph()
+
+
+@inject.autoparams()
+async def increase_ec_listener(eventhub: IEventHub):
+    with eventhub.subscribe("ec.up") as queue:
+        _ = await queue.get()
+        increase_ec()
+
+
+@inject.autoparams()
+async def decrease_ec_listener(eventhub: IEventHub):
+    with eventhub.subscribe("ec.down") as queue:
+        _ = await queue.get()
+        decrease_ec()
