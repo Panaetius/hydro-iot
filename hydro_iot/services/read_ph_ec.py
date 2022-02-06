@@ -36,4 +36,4 @@ def read_ph_conductivity(
     elif ph.value < config.levels.min_ph:
         event_hub.publish(key="ph.up", message="increase_ph")
     elif ph.value > config.levels.max_ph:
-        event_hub.publish(key="ph.down", message="increase_down")
+        event_hub.publish(key="ph.down", message="decrease_ph")
