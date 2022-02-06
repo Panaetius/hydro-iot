@@ -10,11 +10,15 @@ from hydro_iot.domain.config import IConfig
 from hydro_iot.domain.ph import PH
 from hydro_iot.domain.pressure import Pressure
 from hydro_iot.domain.temperature import WaterTemperature
+from hydro_iot.services.ports.logging import ILogging
 from hydro_iot.services.ports.sensors_gateway import ISensorGateway
 
 
 class RaspberrySensorGateway(ISensorGateway):
+    _log = inject.attr(ILogging)
+
     def __init__(self) -> None:
+        self._log.info("Init sensor gateway")
         self.config = inject.instance(IConfig)
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.config.pins.ph_power_gpio, GPIO.OUT)

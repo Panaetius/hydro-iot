@@ -18,9 +18,11 @@ ML_TO_S = 0.9325
 class PumpGateway(IPumpGateway):
     sensor_gateway: ISensorGateway = inject.attr(ISensorGateway)
     config: IConfig = inject.attr(IConfig)
+    _log = inject.attr(ILogging)
 
     def __init__(self) -> None:
-        GPIO.setmode(GPIO.BOARD)
+        self._log("Init pump gateway")
+        GPIO.setmode(GPIO.BCM)
 
         GPIO.setup(self.config.pins.pressure_pump, GPIO.OUT)
         GPIO.setup(self.config.pins.flora_grow_pump, GPIO.OUT)

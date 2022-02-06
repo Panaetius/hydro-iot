@@ -48,6 +48,6 @@ pins {
     box_spray_pins = [
         32,
         33,
-        35
+        37
     ]
 }

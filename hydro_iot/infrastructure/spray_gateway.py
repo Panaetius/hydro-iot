@@ -4,13 +4,16 @@ import inject
 import RPi.GPIO as GPIO
 
 from hydro_iot.domain.config import IConfig
+from hydro_iot.services.ports.logging import ILogging
 from hydro_iot.services.ports.spray_gateway import ISprayGateway
 
 
 class SprayGateway(ISprayGateway):
     config = inject.attr(IConfig)
+    _log = inject.attr(ILogging)
 
     def __init__(self) -> None:
+        self._log.info("Init spray gateway")
         GPIO.setmode(GPIO.BCM)
 
         for box_pin in self.config.pins.box_spray_pins:
