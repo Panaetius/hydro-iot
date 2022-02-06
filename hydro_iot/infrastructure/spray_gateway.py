@@ -11,7 +11,7 @@ class SprayGateway(ISprayGateway):
     config = inject.attr(IConfig)
 
     def __init__(self) -> None:
-        GPIO.setmode(GPIO.BOARD)
+        GPIO.setmode(GPIO.BCM)
 
         for box_pin in self.config.pins.box_spray_pins:
             GPIO.setup(box_pin, GPIO.OUT)
