@@ -58,42 +58,42 @@ def start_service(
     scheduler.start()
 
     message_queue = DummyMQGateway()
-    message_queue.declare_listener(
-        "commands",
-        "user123.set_minimum_ph",
-        message_queue_subscriber.set_minimum_ph_level,
-    )
-    message_queue.declare_listener(
-        "commands",
-        "user123.set_maximum_ph_level",
-        message_queue_subscriber.set_maximum_ph_level,
-    )
-    message_queue.declare_listener(
-        "commands",
-        "user123.set_minimum_conductivity_level",
-        message_queue_subscriber.set_minimum_conductivity_level,
-    )
-    message_queue.declare_listener(
-        "commands",
-        "user123.set_maximum_conductivity_level",
-        message_queue_subscriber.set_maximum_conductivity_level,
-    )
-    message_queue.declare_listener(
-        "commands",
-        "user123.set_minimum_pump_pressure",
-        message_queue_subscriber.set_minimum_pump_pressure,
-    )
-    message_queue.declare_listener(
-        "commands",
-        "user123.set_target_pump_pressure",
-        message_queue_subscriber.set_target_pump_pressure,
-    )
-    message_queue.declare_listener(
-        "commands",
-        "user123.set_spray_timing",
-        message_queue_subscriber.set_spray_timing,
-    )
-    message_queue.start_listening()
+    # message_queue.declare_listener(
+    #     "commands",
+    #     "user123.set_minimum_ph",
+    #     message_queue_subscriber.set_minimum_ph_level,
+    # )
+    # message_queue.declare_listener(
+    #     "commands",
+    #     "user123.set_maximum_ph_level",
+    #     message_queue_subscriber.set_maximum_ph_level,
+    # )
+    # message_queue.declare_listener(
+    #     "commands",
+    #     "user123.set_minimum_conductivity_level",
+    #     message_queue_subscriber.set_minimum_conductivity_level,
+    # )
+    # message_queue.declare_listener(
+    #     "commands",
+    #     "user123.set_maximum_conductivity_level",
+    #     message_queue_subscriber.set_maximum_conductivity_level,
+    # )
+    # message_queue.declare_listener(
+    #     "commands",
+    #     "user123.set_minimum_pump_pressure",
+    #     message_queue_subscriber.set_minimum_pump_pressure,
+    # )
+    # message_queue.declare_listener(
+    #     "commands",
+    #     "user123.set_target_pump_pressure",
+    #     message_queue_subscriber.set_target_pump_pressure,
+    # )
+    # message_queue.declare_listener(
+    #     "commands",
+    #     "user123.set_spray_timing",
+    #     message_queue_subscriber.set_spray_timing,
+    # )
+    # message_queue.start_listening()
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
