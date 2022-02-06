@@ -46,13 +46,13 @@ def start_service(
     scheduler.repeat_job_at_interval(
         func=spray_boxes,
         seconds=config.timings.spray_box_interval_ms / 1000.0,
-        id="check_ph_ec",
+        id="spray_boxes",
     )
 
     scheduler.repeat_job_at_interval(
         func=read_pressure,
         seconds=config.timings.check_pressure_interval_ms / 1000.0,
-        id="check_ph_ec",
+        id="read_pressure",
     )
 
     scheduler.start()
