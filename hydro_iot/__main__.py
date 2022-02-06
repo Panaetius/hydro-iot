@@ -27,9 +27,7 @@ def config(binder):
     binder.bind_to_constructor(IMessageQueueSubscriber, lambda: CommandEventSubscriber())
     binder.bind_to_constructor(IMessageQueuePublisher, lambda: DummyMQGateway())
     binder.bind_to_constructor(IScheduler, lambda: APScheduler())
-    binder.bind_to_constructor(
-        SystemState, lambda: SystemState(last_fertilizer_ph_adjustment=monotonic(), last_ph_adjustment=monotonic())
-    )
+    binder.bind_to_constructor(SystemState, lambda: SystemState(last_fertilizer_ph_adjustment=monotonic()))
     binder.bind_to_constructor(IEventHub, lambda: AsyncioEventHub())
 
     config_path = "config.example.hocon"
