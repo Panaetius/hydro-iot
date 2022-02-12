@@ -20,6 +20,7 @@ class AsyncioEventHub(IEventHub):
     def publish(self, key: str, message: str) -> None:
         for topic, (queue, _) in self.subscriptions.items():
             if re.search(pattern=topic, string=key):
+                self.logging.info(f"Put message into queue {topic} ({id(self)})")
                 queue.put_nowait(message)
 
     @contextmanager
@@ -29,7 +30,7 @@ class AsyncioEventHub(IEventHub):
                 queue, subscription_count = self.subscriptions["topic"]
                 self.subscriptions["topic"] = (queue, subscription_count + 1)
             else:
-                self.logging.info(f"created queue {topic}")
+                self.logging.info(f"created queue {topic} ({id(self)})")
                 queue, _ = self.subscriptions.setdefault(topic, (asyncio.Queue(), 1))
 
         yield queue

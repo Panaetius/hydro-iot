@@ -22,6 +22,18 @@ from hydro_iot.services.read_temperature import read_temperature
 from hydro_iot.services.spray_boxes import spray_boxes
 
 
+async def start_tasks():
+    tasks = [
+        asyncio.create_task(increase_ph_listener()),
+        asyncio.create_task(decrease_ph_listener()),
+        asyncio.create_task(increase_ec_listener()),
+        asyncio.create_task(decrease_ec_listener()),
+        asyncio.create_task(increase_pressure_listener()),
+    ]
+
+    await asyncio.gather(*tasks)
+
+
 @inject.autoparams()
 def start_service(
     scheduler: IScheduler,
@@ -100,13 +112,5 @@ def start_service(
     # message_queue.start_listening()
 
     logging.info("Starting async event loop")
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(
-        asyncio.gather(
-            increase_ph_listener(),
-            decrease_ph_listener(),
-            increase_ec_listener(),
-            decrease_ec_listener(),
-            increase_pressure_listener(),
-        )
-    )
+
+    asyncio.run(start_tasks())
