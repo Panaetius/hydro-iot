@@ -21,6 +21,7 @@ def increase_pressure(
     config: IConfig,
 ):
     try:
+        logging.info(f"Increasing pressure to {config.levels.maximum_pressure_bar}")
         pressure = pump_gateway.increase_system_pressure(
             target_pressure=Pressure(bar=config.levels.maximum_pressure_bar)
         )

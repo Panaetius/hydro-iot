@@ -13,6 +13,7 @@ from hydro_iot.services.adjust_nutrient_solution import (
     increase_ec_listener,
     increase_ph_listener,
 )
+from hydro_iot.services.increase_pressure import increase_pressure_listener
 from hydro_iot.services.ports.logging import ILogging
 from hydro_iot.services.ports.message_queue import IMessageQueueSubscriber
 from hydro_iot.services.read_ph_ec import read_ph_conductivity
@@ -101,5 +102,11 @@ def start_service(
     logging.info("Starting async event loop")
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
-        asyncio.gather(increase_ph_listener(), decrease_ph_listener(), increase_ec_listener(), decrease_ec_listener())
+        asyncio.gather(
+            increase_ph_listener(),
+            decrease_ph_listener(),
+            increase_ec_listener(),
+            decrease_ec_listener(),
+            increase_pressure_listener(),
+        )
     )
