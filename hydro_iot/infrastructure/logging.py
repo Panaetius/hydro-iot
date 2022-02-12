@@ -14,13 +14,10 @@ class Logging(ILogging):
         self._log.setLevel(logging.INFO)
 
     def info(self, message: str):
-        print(message)
         self._log.info(message)
 
     def warn(self, message: str):
-        print(message)
         self._log.warn(message)
 
     def error(self, message: str):
-        print(message)
         self._log.error(message)
