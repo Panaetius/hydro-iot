@@ -17,14 +17,21 @@ def spray_boxes(
     spray_gateway: ISprayGateway,
     sensor_gateway: ISensorGateway,
 ):
-    logging.info("Spraying boxes")
+    if system_state.spraying_boxes:
+        return
+    system_state.spraying_boxes = True
 
-    num_boxes = len(config.pins.box_spray_pins)
+    try:
+        logging.info("Spraying boxes")
 
-    for i in range(num_boxes):
-        spray_gateway.spray_box(i, config.timings.spray_box_timings_ms[i])
-        logging.info(f"Sprayed box {i} for {config.timings.spray_box_timings_ms[i]} ms")
+        num_boxes = len(config.pins.box_spray_pins)
 
-    system_state.current_pressure_level = sensor_gateway.get_pressure()
+        for i in range(num_boxes):
+            spray_gateway.spray_box(i, config.timings.spray_box_timings_ms[i])
+            logging.info(f"Sprayed box {i} for {config.timings.spray_box_timings_ms[i]} ms")
 
-    message_gateway.send_spray_message(num_boxes)
+        system_state.current_pressure_level = sensor_gateway.get_pressure()
+
+        message_gateway.send_spray_message(num_boxes)
+    finally:
+        system_state.spraying_boxes = False

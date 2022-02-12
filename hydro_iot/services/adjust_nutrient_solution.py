@@ -77,28 +77,36 @@ def decrease_ec(
 
 
 @inject.autoparams()
-async def increase_ph_listener(eventhub: IEventHub):
+async def increase_ph_listener(eventhub: IEventHub, logging: ILogging):
     with eventhub.subscribe("ph.up") as queue:
-        _ = await queue.get()
-        increase_ph()
+        logging.info("Started listening for ph up events")
+        while True:
+            _ = await queue.get()
+            increase_ph()
 
 
 @inject.autoparams()
-async def decrease_ph_listener(eventhub: IEventHub):
+async def decrease_ph_listener(eventhub: IEventHub, logging: ILogging):
     with eventhub.subscribe("ph.down") as queue:
-        _ = await queue.get()
-        decrease_ph()
+        logging.info("Started listening for ph down events")
+        while True:
+            _ = await queue.get()
+            decrease_ph()
 
 
 @inject.autoparams()
-async def increase_ec_listener(eventhub: IEventHub):
+async def increase_ec_listener(eventhub: IEventHub, logging: ILogging):
     with eventhub.subscribe("ec.up") as queue:
-        _ = await queue.get()
-        increase_ec()
+        logging.info("Started listening for ec up events")
+        while True:
+            _ = await queue.get()
+            increase_ec()
 
 
 @inject.autoparams()
-async def decrease_ec_listener(eventhub: IEventHub):
+async def decrease_ec_listener(eventhub: IEventHub, logging: ILogging):
     with eventhub.subscribe("ec.down") as queue:
-        _ = await queue.get()
-        decrease_ec()
+        logging.info("Started listening for ec down events")
+        while True:
+            _ = await queue.get()
+            decrease_ec()

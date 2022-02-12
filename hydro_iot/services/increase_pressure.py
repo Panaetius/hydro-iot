@@ -20,6 +20,9 @@ def increase_pressure(
     message_queue: IMessageQueuePublisher,
     config: IConfig,
 ):
+    if system_state.increasing_pressure:
+        return
+
     try:
         logging.info(f"Increasing pressure to {config.levels.maximum_pressure_bar}")
         pressure = pump_gateway.increase_system_pressure(
@@ -34,7 +37,9 @@ def increase_pressure(
 
 
 @inject.autoparams()
-async def increase_pressure_listener(eventhub: IEventHub):
+async def increase_pressure_listener(eventhub: IEventHub, logging: ILogging):
     with eventhub.subscribe("pressure.increase") as queue:
-        _ = await queue.get()
-        increase_pressure()
+        logging.info("started listening to pressure up events")
+        while True:
+            _ = await queue.get()
+            increase_pressure()
