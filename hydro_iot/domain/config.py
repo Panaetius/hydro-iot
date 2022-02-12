@@ -10,6 +10,7 @@ class Timings:
     spray_box_interval_ms: int
     spray_box_timings_ms: List[int]
     ph_ec_adjustment_downtime_ms: int
+    minimum_pressure_error_wait_time_ms: int
 
 
 @dataclass

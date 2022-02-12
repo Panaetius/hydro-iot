@@ -4,8 +4,9 @@ from hydro_iot.domain.pressure import Pressure
 
 
 class PressureNotIncreasingError(Exception):
-    def __init__(self, message: str = "Pressure hasn't increased while pumping") -> None:
+    def __init__(self, pressure: Pressure, message: str = "Pressure hasn't increased while pumping") -> None:
         self.message = message
+        self.pressure = pressure
         super().__init__(self.message)
 
 

@@ -62,7 +62,7 @@ class PumpGateway(IPumpGateway):
                         last_max_measured += 1
 
                     if last_max_measured > MAX_INTERVAL_WITHOUT_PRESSURE_INCREASE:
-                        raise PressureNotIncreasingError()
+                        raise PressureNotIncreasingError(pressure=Pressure(current_pressure))
 
                     sleep(SLEEP_BETWEEN_MEASUREMENTS)
 

@@ -22,6 +22,7 @@ class AsyncioEventHub(IEventHub):
             if re.search(pattern=topic, string=key):
                 self.logging.info(f"Put message into queue {topic} ({id(self)})")
                 queue.put_nowait(message)
+                # Force queue to be updated as asyncio otherwise doesn't work with threads
                 queue._loop._write_to_self()
 
     @contextmanager

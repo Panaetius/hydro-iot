@@ -1,3 +1,5 @@
+from time import monotonic
+
 import inject
 
 from hydro_iot.domain.config import IConfig
@@ -19,6 +21,10 @@ def read_pressure(
 ):
     pressure = sensor_gateway.get_pressure()
 
+    if not system_state.current_pressure_level:
+        # Set current pressure on first measurement
+        system_state.current_pressure_level = pressure
+
     logging.info(f"Pressure: {pressure.bar} Bar")
     message_gateway.send_pressure_status(pressure)
     logging.info("Sent pressure status message")
@@ -30,6 +36,11 @@ def read_pressure(
         and not system_state.spraying_boxes
         and difference > config.levels.pressure_drop_error_threshold
     ):
+        system_state.pressure_error = True
+        system_state.pressure_error_time = monotonic()
+        system_state.pressure_error_pressure = pressure
+
+        logging.error("Pressure dropped unexpectedly since last pumping/spraying.")
         message_gateway.send_unexpected_pressure_drop(difference)
 
     if pressure.bar < config.levels.minimum_pressure_bar:

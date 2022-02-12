@@ -9,6 +9,7 @@ timings {
         750
     ]
     ph_ec_adjustment_downtime_ms = 1200000
+    minimum_pressure_error_wait_time_ms = 30000
 }
 
 levels {

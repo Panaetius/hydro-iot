@@ -37,7 +37,7 @@ def config(binder):
     binder.bind_to_constructor(IScheduler, lambda: APScheduler())
     binder.bind_to_constructor(
         SystemState,
-        lambda: SystemState(last_fertilizer_ph_adjustment=monotonic(), current_pressure_level=Pressure(bar=0.0)),
+        lambda: SystemState(last_fertilizer_ph_adjustment=monotonic()),
     )
     binder.bind_to_constructor(IEventHub, lambda: AsyncioEventHub())
     binder.bind_to_constructor(ISprayGateway, lambda: SprayGateway())
