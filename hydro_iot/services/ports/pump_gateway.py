@@ -3,8 +3,14 @@ from abc import ABC
 from hydro_iot.domain.pressure import Pressure
 
 
+class PressureNotIncreasingError(Exception):
+    def __init__(self, message: str = "Pressure hasn't increased while pumping") -> None:
+        self.message = message
+        super().__init__(self.message)
+
+
 class IPumpGateway(ABC):
-    def increase_system_pressure(self, target_pressure: Pressure):
+    def increase_system_pressure(self, target_pressure: Pressure) -> Pressure:
         raise NotImplementedError()
 
     def increase_fertilizer(self, flora_grow_ml: float, flora_micro_ml: float, flora_bloom_ml: float):

@@ -36,6 +36,15 @@ class IMessageQueuePublisher(ABC):
     def send_ec_increased(self, amount_grow: float, amount_micro: float, amount_bloom: float):
         raise NotImplementedError()
 
+    def send_pressure_raised(self, pressure: Pressure):
+        raise NotImplementedError()
+
+    def send_unexpected_pressure_drop(self, pressure_drop: float):
+        raise NotImplementedError()
+
+    def send_could_not_raise_pressure(self):
+        raise NotImplementedError()
+
 
 class IMessageQueueSubscriber(ABC):
     def set_minimum_ph_level(self, ph: PH):

@@ -13,6 +13,7 @@ from hydro_iot.services.adjust_nutrient_solution import (
     increase_ec_listener,
     increase_ph_listener,
 )
+from hydro_iot.services.ports.logging import ILogging
 from hydro_iot.services.ports.message_queue import IMessageQueueSubscriber
 from hydro_iot.services.read_ph_ec import read_ph_conductivity
 from hydro_iot.services.read_pressure import read_pressure
@@ -24,13 +25,15 @@ from hydro_iot.services.spray_boxes import spray_boxes
 def start_service(
     scheduler: IScheduler,
     config: IConfig,
+    logging: ILogging,
     message_queue_subscriber: IMessageQueueSubscriber,
 ):
-    print("Starting up ...")
-    print("Startup complete")
+    logging.info("Starting up ...")
+    logging.info("Startup complete")
     # Tell systemd that our service is ready
     daemon.notify(daemon.Notification.READY)
 
+    logging.info("Setting up scheduler")
     scheduler.repeat_job_at_interval(
         func=read_temperature,
         seconds=config.timings.check_temperature_interval_ms / 1000.0,
@@ -95,6 +98,7 @@ def start_service(
     # )
     # message_queue.start_listening()
 
+    logging.info("Starting async event loop")
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
         asyncio.gather(increase_ph_listener(), decrease_ph_listener(), increase_ec_listener(), decrease_ec_listener())

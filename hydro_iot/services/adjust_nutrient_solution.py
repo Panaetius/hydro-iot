@@ -5,37 +5,55 @@ import inject
 from hydro_iot.domain.config import IConfig
 from hydro_iot.domain.system_state import SystemState
 from hydro_iot.services.ports.event_queue import IEventHub
+from hydro_iot.services.ports.logging import ILogging
 from hydro_iot.services.ports.message_queue import IMessageQueuePublisher
 from hydro_iot.services.ports.pump_gateway import IPumpGateway
 
 
 @inject.autoparams()
 def increase_ph(
-    system_state: SystemState, pump_gateway: IPumpGateway, message_queue: IMessageQueuePublisher, config: IConfig
+    system_state: SystemState,
+    logging: ILogging,
+    pump_gateway: IPumpGateway,
+    message_queue: IMessageQueuePublisher,
+    config: IConfig,
 ):
     system_state.last_fertilizer_ph_adjustment = monotonic()
     pump_gateway.raise_ph(config.amounts.ph_increase_ml)
+    logging.info(f"Increased PH with {config.amounts.ph_increase_ml} ml solution")
     message_queue.send_ph_raised(amount=config.amounts.ph_increase_ml)
 
 
 @inject.autoparams()
 def decrease_ph(
-    system_state: SystemState, pump_gateway: IPumpGateway, message_queue: IMessageQueuePublisher, config: IConfig
+    system_state: SystemState,
+    logging: ILogging,
+    pump_gateway: IPumpGateway,
+    message_queue: IMessageQueuePublisher,
+    config: IConfig,
 ):
     system_state.last_fertilizer_ph_adjustment = monotonic()
     pump_gateway.lower_ph(config.amounts.ph_decrease_ml)
+    logging.info(f"Lowered PH with {config.amounts.ph_decrease_ml} ml solution")
     message_queue.send_ph_lowered(amount=config.amounts.ph_increase_ml)
 
 
 @inject.autoparams()
 def increase_ec(
-    system_state: SystemState, pump_gateway: IPumpGateway, message_queue: IMessageQueuePublisher, config: IConfig
+    system_state: SystemState,
+    logging: ILogging,
+    pump_gateway: IPumpGateway,
+    message_queue: IMessageQueuePublisher,
+    config: IConfig,
 ):
     system_state.last_fertilizer_ph_adjustment = monotonic()
     pump_gateway.increase_fertilizer(
         flora_grow_ml=config.amounts.flora_grow_ml,
         flora_micro_ml=config.amounts.flora_micro_ml,
         flora_bloom_ml=config.amounts.flora_bloom_ml,
+    )
+    logging.info(
+        f"Increased EC with {config.amounts.flora_grow_ml}/{config.amounts.flora_micro_ml}/{config.amounts.flora_bloom_ml} ml solution"
     )
     message_queue.send_ec_increased(
         amount_grow=config.amounts.flora_grow_ml,
@@ -46,10 +64,15 @@ def increase_ec(
 
 @inject.autoparams()
 def decrease_ec(
-    system_state: SystemState, pump_gateway: IPumpGateway, message_queue: IMessageQueuePublisher, config: IConfig
+    system_state: SystemState,
+    logging: ILogging,
+    pump_gateway: IPumpGateway,
+    message_queue: IMessageQueuePublisher,
+    config: IConfig,
 ):
     system_state.last_fertilizer_ph_adjustment = monotonic()
     pump_gateway.lower_fertilizer(amount_ml=config.amounts.fresh_water_ml)
+    logging.info(f"Decreased EC by adding {config.amounts.fresh_water_ml} ml fresh water.")
     message_queue.send_ec_lowered(amount=config.amounts.fresh_water_ml)
 
 

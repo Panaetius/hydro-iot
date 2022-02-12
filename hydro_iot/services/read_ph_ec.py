@@ -25,25 +25,25 @@ def read_ph_conductivity(
     sleep(0.5)
 
     ec = sensor_gateway.get_conductivity()
-    logging.info(f"EC: {ec.microsiemens_per_meter}")
+    logging.info(f"EC: {ec.microsiemens_per_meter} µS/m")
 
     message_gateway.send_ph_value(ph)
     message_gateway.send_fertilizer_level(ec)
 
-    logging.info("Sent ph ec messages")
+    logging.info("Sent ph ec status messages")
 
     if monotonic() - system_state.last_fertilizer_ph_adjustment < config.timings.ph_ec_adjustment_downtime_ms:
         return
 
     if ec.microsiemens_per_meter < config.levels.min_ec:
-        event_hub.publish(key="ec.up", message="increase_ec")
         logging.info("Increasing EC")
+        event_hub.publish(key="ec.up", message="increase_ec")
     elif config.pins.fresh_water_pump and ec.microsiemens_per_meter > config.levels.max_ec:
-        event_hub.publish(key="ec.down", message="decrease_ec")
         logging.info("Decreasing EC")
+        event_hub.publish(key="ec.down", message="decrease_ec")
     elif ph.value < config.levels.min_ph:
-        event_hub.publish(key="ph.up", message="increase_ph")
         logging.info("Increasing PH")
+        event_hub.publish(key="ph.up", message="increase_ph")
     elif ph.value > config.levels.max_ph:
-        event_hub.publish(key="ph.down", message="decrease_ph")
         logging.info("Decreasing PH")
+        event_hub.publish(key="ph.down", message="decrease_ph")

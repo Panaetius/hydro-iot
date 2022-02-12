@@ -17,6 +17,8 @@ levels {
     max_ec = 1800
     min_ec = 1200
     minimum_pressure_bar = 6.0
+    maximum_pressure_bar = 8.5
+    pressure_drop_error_threshold = 0.25
 }
 
 amounts {

@@ -6,6 +6,7 @@ import RPi.GPIO as GPIO
 from hydro_iot.controller.interface.scheduler import IScheduler
 from hydro_iot.controller.service import start_service
 from hydro_iot.domain.config import IConfig
+from hydro_iot.domain.pressure import Pressure
 from hydro_iot.domain.system_state import SystemState
 from hydro_iot.infrastructure.config import Config
 
@@ -32,7 +33,10 @@ def config(binder):
     binder.bind_to_constructor(IMessageQueueSubscriber, lambda: CommandEventSubscriber())
     binder.bind_to_constructor(IMessageQueuePublisher, lambda: DummyMQGateway())
     binder.bind_to_constructor(IScheduler, lambda: APScheduler())
-    binder.bind_to_constructor(SystemState, lambda: SystemState(last_fertilizer_ph_adjustment=monotonic()))
+    binder.bind_to_constructor(
+        SystemState,
+        lambda: SystemState(last_fertilizer_ph_adjustment=monotonic(), current_pressure_level=Pressure(bar=0.0)),
+    )
     binder.bind_to_constructor(IEventHub, lambda: AsyncioEventHub())
     binder.bind_to_constructor(ISprayGateway, lambda: SprayGateway())
     binder.bind_to_constructor(ILogging, lambda: Logging())

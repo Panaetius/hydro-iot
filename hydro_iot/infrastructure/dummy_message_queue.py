@@ -38,3 +38,12 @@ class DummyMQGateway(IMessageQueuePublisher):
 
     def send_ec_increased(self, amount_grow: float, amount_micro: float, amount_bloom: float):
         pass
+
+    def send_pressure_raised(self, pressure: Pressure):
+        pass
+
+    def send_unexpected_pressure_drop(self, pressure_drop: float):
+        pass
+
+    def send_could_not_raise_pressure(self):
+        pass

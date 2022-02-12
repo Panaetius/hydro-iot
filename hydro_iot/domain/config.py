@@ -19,6 +19,8 @@ class Levels:
     max_ec: float
     min_ec: float
     minimum_pressure_bar: float
+    maximum_pressure_bar: float
+    pressure_drop_error_threshold: float
 
 
 @dataclass
