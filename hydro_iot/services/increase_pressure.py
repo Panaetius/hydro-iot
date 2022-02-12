@@ -42,4 +42,5 @@ async def increase_pressure_listener(eventhub: IEventHub, logging: ILogging):
         logging.info("started listening to pressure up events")
         while True:
             _ = await queue.get()
+            logging.info("Got increase pressure event")
             increase_pressure()

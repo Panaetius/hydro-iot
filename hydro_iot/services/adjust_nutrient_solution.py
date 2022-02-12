@@ -82,6 +82,7 @@ async def increase_ph_listener(eventhub: IEventHub, logging: ILogging):
         logging.info("Started listening for ph up events")
         while True:
             _ = await queue.get()
+            logging.info("Got increase ph event")
             increase_ph()
 
 
@@ -91,6 +92,7 @@ async def decrease_ph_listener(eventhub: IEventHub, logging: ILogging):
         logging.info("Started listening for ph down events")
         while True:
             _ = await queue.get()
+            logging.info("Got decrease ph event")
             decrease_ph()
 
 
@@ -100,6 +102,7 @@ async def increase_ec_listener(eventhub: IEventHub, logging: ILogging):
         logging.info("Started listening for ec up events")
         while True:
             _ = await queue.get()
+            logging.info("Got increase ec event")
             increase_ec()
 
 
@@ -109,4 +112,5 @@ async def decrease_ec_listener(eventhub: IEventHub, logging: ILogging):
         logging.info("Started listening for ec down events")
         while True:
             _ = await queue.get()
+            logging.info("Got decrease ec event")
             decrease_ec()
