@@ -56,10 +56,16 @@ class RabbitMQGateway(IMessageQueuePublisher):
 
     def publish_connection_open_callback(self, connection):
         self.logging.info("Opening publish channels")
-        self.sensor_data_channel = connection.channel()
+        connection.channel(self.sensor_channel_callback)
+
+        connection.channel(self.event_channel_callback)
+
+    def sensor_channel_callback(self, channel):
+        self.sensor_data_channel = channel
         self.sensor_data_channel.queue_declare(queue="sensor_data")
 
-        self.event_data_channel = connection.channel()
+    def event_channel_callback(self, channel):
+        self.event_data_channel = channel
         self.event_data_channel.queue_declare(queue="event_data")
 
     def _open_callback(self, connection):
