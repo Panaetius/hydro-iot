@@ -33,6 +33,15 @@ class RaspberrySensorGateway(ISensorGateway):
         self._acid_ph_voltage = 2032.44
         self._hpa_zero_pressure_voltage = 488
 
+    def _adc_result_to_voltage(self, measurement: int) -> float:
+        """Convert an ADC measurement to actual voltage."""
+        if measurement >> 31 == 1:
+            result = -1.0 * (self._ref * 2 - measurement * self._ref / 0x80000000)
+        else:
+            result = measurement * self._ref / 0x7FFFFFFF
+
+        return result
+
     def get_temperature(self) -> WaterTemperature:
         sensor = next(iter(Pi1Wire().find_all_sensors()), None)
 
@@ -48,10 +57,7 @@ class RaspberrySensorGateway(ISensorGateway):
         for _ in range(10):
             result = self._adc.ADS1263_GetChannalValue(self.config.pins.tds_sensor_adc)
 
-            if result >> 31 == 1:
-                result = -1 * (self._ref * 2 - result * self._ref / 0x800000)
-            else:
-                result = result * self._ref / 0x7FFFFF
+            result = self._adc_result_to_voltage(result)
 
             values.append(result)
             sleep(0.05)
@@ -75,10 +81,7 @@ class RaspberrySensorGateway(ISensorGateway):
         for _ in range(10):
             result = self._adc.ADS1263_GetChannalValue(self.config.pins.ph_sensor_adc)
 
-            if result >> 31 == 1:
-                result = -1 * (self._ref * 2 - result * self._ref / 0x800000)
-            else:
-                result = result * self._ref / 0x7FFFFF
+            result = self._adc_result_to_voltage(result)
 
             values.append(result)
             sleep(0.05)
@@ -98,10 +101,7 @@ class RaspberrySensorGateway(ISensorGateway):
         for _ in range(5):
             result = self._adc.ADS1263_GetChannalValue(self.config.pins.pressure_sensor_adc)
 
-            if result >> 31 == 1:
-                result = -1 * (self._ref * 2 - result * self._ref / 0x800000)
-            else:
-                result = result * self._ref / 0x7FFFFF
+            result = self._adc_result_to_voltage(result)
 
             values.append(result)
 
