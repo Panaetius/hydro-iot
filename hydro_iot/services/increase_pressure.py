@@ -1,4 +1,4 @@
-from time import monotonic
+from time import monotonic, sleep
 
 import inject
 
@@ -67,6 +67,10 @@ def increase_pressure(
         pressure = pump_gateway.increase_system_pressure(
             target_pressure=Pressure(bar=config.levels.maximum_pressure_bar)
         )
+        # wait a bit for the system to settle
+        sleep(1)
+        pressure = sensor_gateway.get_pressure()
+
         logging.info(f"Increased pressure to {pressure.bar} bar.")
         system_state.current_pressure_level = pressure
         message_queue.send_pressure_raised(pressure=pressure)

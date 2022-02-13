@@ -31,7 +31,7 @@ class RaspberrySensorGateway(ISensorGateway):
         self._ref = 5.08
         self._neutral_ph_voltage = 1500.0
         self._acid_ph_voltage = 2032.44
-        self._hpa_zero_pressure_voltage = 488
+        self._hpa_zero_pressure_voltage = 512.5687156992819
 
     def _adc_result_to_voltage(self, measurement: int) -> float:
         """Convert an ADC measurement to actual voltage."""
