@@ -72,7 +72,7 @@ def start_service(
 
     scheduler.start()
 
-    message_queue = DummyMQGateway()
+    # message_queue = DummyMQGateway()
     # message_queue.declare_listener(
     #     "commands",
     #     "user123.set_minimum_ph",

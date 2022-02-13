@@ -68,7 +68,7 @@ def increase_pressure(
             target_pressure=Pressure(bar=config.levels.maximum_pressure_bar)
         )
         # wait a bit for the system to settle
-        sleep(1)
+        sleep(2)
         pressure = sensor_gateway.get_pressure()
 
         logging.info(f"Increased pressure to {pressure.bar} bar.")

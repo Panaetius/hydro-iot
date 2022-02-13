@@ -34,12 +34,12 @@ def read_pressure(
     if (
         not system_state.increasing_pressure
         and not system_state.spraying_boxes
+        and not system_state.pressure_error
         and difference > config.levels.pressure_drop_error_threshold
     ):
         system_state.pressure_error = True
         system_state.pressure_error_time = monotonic()
         system_state.pressure_error_pressure = pressure
-
         logging.error("Pressure dropped unexpectedly since last pumping/spraying.")
         message_gateway.send_unexpected_pressure_drop(difference)
 
