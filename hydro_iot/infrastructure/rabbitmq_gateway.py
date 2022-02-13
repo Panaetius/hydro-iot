@@ -39,15 +39,17 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 credentials=pika.PlainCredentials(
                     self.config.message_queue_connection.user, self.config.message_queue_connection.password
                 ),
-            )
+            ),
+            on_open_callback=self._open_callback,
         )
 
         self.channels = dict()
 
-        self.sensor_data_channel = self.publish_connection.channel()
+    def publish_connection_open_callback(self, connection):
+        self.sensor_data_channel = connection.channel()
         self.sensor_data_channel.queue_declare(queue="sensor_data")
 
-        self.event_data_channel = self.publish_connection.channel()
+        self.event_data_channel = connection.channel()
         self.event_data_channel.queue_declare(queue="event_data")
 
     def _open_callback(self, connection):
