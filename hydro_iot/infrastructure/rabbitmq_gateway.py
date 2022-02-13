@@ -79,7 +79,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
 
         with self.publish_lock:
             self.sensor_data_channel.basic_publish(
-                routing_key="measurement.temperature", body=json.dumps({"temperature": temperature.value})
+                exchange="", routing_key="measurement.temperature", body=json.dumps({"temperature": temperature.value})
             )
 
     def send_ph_value(self, ph: PH):
@@ -87,7 +87,9 @@ class RabbitMQGateway(IMessageQueuePublisher):
             return
 
         with self.publish_lock:
-            self.sensor_data_channel.basic_publish(routing_key="measurement.ph", body=json.dumps({"ph": ph.value}))
+            self.sensor_data_channel.basic_publish(
+                exchange="", routing_key="measurement.ph", body=json.dumps({"ph": ph.value})
+            )
 
     def send_fertilizer_level(self, ec: Conductivity):
         if not self.sensor_data_channel:
@@ -95,7 +97,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
 
         with self.publish_lock:
             self.sensor_data_channel.basic_publish(
-                routing_key="measurement.ec", body=json.dumps({"ec": ec.microsiemens_per_meter})
+                exchange="", routing_key="measurement.ec", body=json.dumps({"ec": ec.microsiemens_per_meter})
             )
 
     def send_pressure_status(self, pressure: Pressure):
@@ -104,7 +106,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
 
         with self.publish_lock:
             self.sensor_data_channel.basic_publish(
-                routing_key="measurement.pressure", body=json.dumps({"pressure": pressure.bar})
+                exchange="", routing_key="measurement.pressure", body=json.dumps({"pressure": pressure.bar})
             )
 
     def send_spray_message(self, index: int, duration: int):
@@ -113,7 +115,9 @@ class RabbitMQGateway(IMessageQueuePublisher):
 
         with self.publish_lock:
             self.event_data_channel.basic_publish(
-                routing_key=f"event.boxes.spray.{index}", body=json.dumps({"index": index, "duration": duration})
+                exchange="",
+                routing_key=f"event.boxes.spray.{index}",
+                body=json.dumps({"index": index, "duration": duration}),
             )
 
     def send_ph_raised(self, amount: float):
@@ -122,7 +126,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
 
         with self.publish_lock:
             self.event_data_channel.basic_publish(
-                routing_key=f"event.adjustment.ph.up", body=json.dumps({"amount": amount})
+                exchange="", routing_key=f"event.adjustment.ph.up", body=json.dumps({"amount": amount})
             )
 
     def send_ph_lowered(self, amount: float):
@@ -131,7 +135,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
 
         with self.publish_lock:
             self.event_data_channel.basic_publish(
-                routing_key=f"event.adjustment.ph.down", body=json.dumps({"amount": amount})
+                exchange="", routing_key=f"event.adjustment.ph.down", body=json.dumps({"amount": amount})
             )
 
     def send_ec_lowered(self, amount: float):
@@ -140,7 +144,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
 
         with self.publish_lock:
             self.event_data_channel.basic_publish(
-                routing_key=f"event.adjustment.ec.down", body=json.dumps({"amount": amount})
+                exchange="", routing_key=f"event.adjustment.ec.down", body=json.dumps({"amount": amount})
             )
 
     def send_ec_increased(self, amount_grow: float, amount_micro: float, amount_bloom: float):
@@ -149,6 +153,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
 
         with self.publish_lock:
             self.event_data_channel.basic_publish(
+                exchange="",
                 routing_key=f"event.adjustment.ec.up",
                 body=json.dumps(
                     {"amount_grow": amount_grow, "amount_micro": amount_micro, "amount_bloom": amount_bloom}
@@ -161,7 +166,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
 
         with self.publish_lock:
             self.event_data_channel.basic_publish(
-                routing_key=f"event.adjustment.pressure.up", body=json.dumps({"bar": pressure.bar})
+                exchange="", routing_key=f"event.adjustment.pressure.up", body=json.dumps({"bar": pressure.bar})
             )
 
     def send_unexpected_pressure_drop(self, pressure_drop: float):
@@ -170,7 +175,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
 
         with self.publish_lock:
             self.event_data_channel.basic_publish(
-                routing_key=f"event.exception.pressure.drop", body=json.dumps({"drop": pressure_drop})
+                exchange="", routing_key=f"event.exception.pressure.drop", body=json.dumps({"drop": pressure_drop})
             )
 
     def send_could_not_raise_pressure(self):
@@ -178,4 +183,6 @@ class RabbitMQGateway(IMessageQueuePublisher):
             return
 
         with self.publish_lock:
-            self.event_data_channel.basic_publish(routing_key=f"event.exception.pressure.not_increasing", body="")
+            self.event_data_channel.basic_publish(
+                exchange="", routing_key=f"event.exception.pressure.not_increasing", body=""
+            )
