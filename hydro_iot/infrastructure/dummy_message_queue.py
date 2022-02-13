@@ -24,7 +24,7 @@ class DummyMQGateway(IMessageQueuePublisher):
     def send_pressure_status(self, pressure: Pressure):
         pass
 
-    def send_spray_message(self, num_boxes: int):
+    def send_spray_message(self, index: int, duration: int):
         pass
 
     def send_ph_raised(self, amount: float):

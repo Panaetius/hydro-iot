@@ -33,7 +33,7 @@ amounts {
 
 message_queue_connection {
     host = localhost
-    port = 1234
+    port = 5672
 }
 
 pins {
