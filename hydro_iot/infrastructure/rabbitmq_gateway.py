@@ -28,44 +28,31 @@ class RabbitMQGateway(IMessageQueuePublisher):
         self.sensor_data_channel = None
         self.event_data_channel = None
 
-        self.consume_connection = pika.SelectConnection(
+        self.consume_connection = pika.BlockingConnection(
             pika.ConnectionParameters(
                 host=self.config.message_queue_connection.host,
                 port=self.config.message_queue_connection.port,
                 credentials=pika.PlainCredentials(
                     self.config.message_queue_connection.user, self.config.message_queue_connection.password
                 ),
-            ),
-            on_open_callback=self._open_callback,
+            )
         )
 
-        self.publish_connection = pika.SelectConnection(
+        self.publish_connection = pika.BlockingConnection(
             pika.ConnectionParameters(
                 host=self.config.message_queue_connection.host,
                 port=self.config.message_queue_connection.port,
                 credentials=pika.PlainCredentials(
                     self.config.message_queue_connection.user, self.config.message_queue_connection.password
                 ),
-            ),
-            on_open_callback=self.publish_connection_open_callback,
+            )
         )
         self.channels = dict()
         self.logging.info("Starting messagequeue io loop")
-        Thread(target=self.publish_connection.ioloop.start).start()
-        Thread(target=self.consume_connection.ioloop.start).start()
+        self.sensor_data_channel = self.publish_connection.channel()
+        self.event_data_channel = self.publish_connection.channel()
 
-    def publish_connection_open_callback(self, connection):
-        self.logging.info("Opening publish channels")
-        connection.channel(self.sensor_channel_callback)
-
-        connection.channel(self.event_channel_callback)
-
-    def sensor_channel_callback(self, channel):
-        self.sensor_data_channel = channel
         self.sensor_data_channel.queue_declare(queue="sensor_data")
-
-    def event_channel_callback(self, channel):
-        self.event_data_channel = channel
         self.event_data_channel.queue_declare(queue="event_data")
 
     def _open_callback(self, connection):
