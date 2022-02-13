@@ -1,5 +1,4 @@
 import asyncio
-import time
 
 import cysystemd.daemon as daemon
 import inject

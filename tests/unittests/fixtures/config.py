@@ -44,7 +44,7 @@ message_queue_connection {
 pins {
     tds_sensor_adc = 0
     ph_sensor_adc = 1
-    pressure_adc_sensor = 2
+    pressure_sensor_adc = 2
     tds_power_gpio = 5  # Pin 29
     ph_power_gpio = 6   # Pin 31
     pressure_pump= 19

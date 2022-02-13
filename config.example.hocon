@@ -37,9 +37,9 @@ message_queue_connection {
 }
 
 pins {
-    tds_sensor_adc = 27
-    ph_sensor_adc = 23
-    pressure_adc_sensor = 24
+    tds_sensor_adc = 0
+    ph_sensor_adc = 1
+    pressure_sensor_adc = 2
     tds_power_gpio = 25
     ph_power_gpio = 5
     pressure_pump= 6
@@ -49,8 +49,8 @@ pins {
     ph_up_pump = 16
     ph_down_pump = 26
     box_spray_pins = [
+        23,
         20,
-        21,
         21
     ]
 }

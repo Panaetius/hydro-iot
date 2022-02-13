@@ -96,7 +96,7 @@ class RaspberrySensorGateway(ISensorGateway):
     def get_pressure(self) -> Pressure:
         values = []
         for _ in range(5):
-            result = self._adc.ADS1263_GetChannalValue(self.config.pins.pressure_adc_sensor)
+            result = self._adc.ADS1263_GetChannalValue(self.config.pins.pressure_sensor_adc)
 
             if result >> 31 == 1:
                 result = -1 * (self._ref * 2 - result * self._ref / 0x800000)

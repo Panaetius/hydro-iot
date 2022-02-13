@@ -42,7 +42,7 @@ class IMessageQueueConnectionInfo:
 class Pins:
     tds_sensor_adc: int
     ph_sensor_adc: int
-    pressure_adc_sensor: int
+    pressure_sensor_adc: int
     tds_power_gpio: int
     ph_power_gpio: int
     pressure_pump: int
