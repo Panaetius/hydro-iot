@@ -42,7 +42,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
             ),
             on_open_callback=self._open_callback,
         )
-
+        self.publish_connection.ioloop.start()
         self.channels = dict()
 
     def publish_connection_open_callback(self, connection):
