@@ -1,5 +1,5 @@
 import json
-from threading import Lock
+from threading import Lock, Thread
 from typing import Callable
 
 import inject
@@ -40,10 +40,12 @@ class RabbitMQGateway(IMessageQueuePublisher):
                     self.config.message_queue_connection.user, self.config.message_queue_connection.password
                 ),
             ),
-            on_open_callback=self._open_callback,
+            on_open_callback=self.publish_connection_open_callback,
         )
-        self.publish_connection.ioloop.start()
         self.channels = dict()
+
+        Thread(target=self.publish_connection.ioloop.start).start()
+        Thread(target=self.consume_connection.ioloop.start).start()
 
     def publish_connection_open_callback(self, connection):
         self.sensor_data_channel = connection.channel()
