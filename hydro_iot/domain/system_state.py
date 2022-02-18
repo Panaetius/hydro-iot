@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from threading import Lock
 from typing import Optional
 
 from hydro_iot.domain.pressure import Pressure
@@ -13,3 +14,4 @@ class SystemState:
     pressure_error: bool = False
     pressure_error_time: Optional[float] = None
     pressure_error_pressure: Optional[Pressure] = None
+    power_output_lock: Lock = Lock()

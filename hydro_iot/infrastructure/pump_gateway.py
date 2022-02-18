@@ -41,7 +41,7 @@ class PumpGateway(IPumpGateway):
         GPIO.setup(self.config.pins.ph_down_pump, GPIO.OUT)
 
     def increase_system_pressure(self, target_pressure: Pressure) -> Pressure:
-        with self.pressure_lock:
+        with self.pressure_lock, self.system_state.power_output_lock:
             self.system_state.increasing_pressure = True
 
             current_pressure = self.sensor_gateway.get_pressure().bar
@@ -84,19 +84,18 @@ class PumpGateway(IPumpGateway):
             (flora_bloom_time, self.config.pins.flora_bloom_pump),
         ]
         pumps = sorted(pumps, key=lambda x: x[0])
-        pumps_before, pumps_after = tee(pumps)
-        next(pumps_after, None)
-        pumps = [pumps[0]] + [(after[0] - before[0], after[1]) for before, after in zip(pumps_before, pumps_after)]
+        # pumps_before, pumps_after = tee(pumps)
+        # next(pumps_after, None)
+        # pumps = [pumps[0]] + [(after[0] - before[0], after[1]) for before, after in zip(pumps_before, pumps_after)]
 
-        with self.ph_fertilizer_lock:
+        with self.ph_fertilizer_lock, self.system_state.power_output_lock:
             try:
-                GPIO.output(self.config.pins.flora_grow_pump, GPIO.HIGH)
-                GPIO.output(self.config.pins.flora_micro_pump, GPIO.HIGH)
-                GPIO.output(self.config.pins.flora_bloom_pump, GPIO.HIGH)
-
                 for duration, pin in pumps:
-                    sleep(duration)
-                    GPIO.output(pin, GPIO.LOW)
+                    try:
+                        GPIO.output(pin, GPIO.HIGH)
+                        sleep(duration)
+                    finally:
+                        GPIO.output(pin, GPIO.LOW)
 
             finally:
                 GPIO.output(self.config.pins.flora_grow_pump, GPIO.LOW)
@@ -109,7 +108,7 @@ class PumpGateway(IPumpGateway):
     def raise_ph(self, amount_ml: float):
         duration = amount_ml * ML_TO_S
 
-        with self.ph_fertilizer_lock:
+        with self.ph_fertilizer_lock, self.system_state.power_output_lock:
             try:
                 GPIO.output(self.config.pins.ph_up_pump, GPIO.HIGH)
                 sleep(duration)
@@ -119,7 +118,7 @@ class PumpGateway(IPumpGateway):
     def lower_ph(self, amount_ml: float):
         duration = amount_ml * ML_TO_S
 
-        with self.ph_fertilizer_lock:
+        with self.ph_fertilizer_lock, self.system_state.power_output_lock:
             try:
                 GPIO.output(self.config.pins.ph_down_pump, GPIO.HIGH)
                 sleep(duration)

@@ -9,6 +9,7 @@ from hydro_iot.domain.conductivity import Conductivity
 from hydro_iot.domain.config import IConfig
 from hydro_iot.domain.ph import PH
 from hydro_iot.domain.pressure import Pressure
+from hydro_iot.domain.system_state import SystemState
 from hydro_iot.domain.temperature import WaterTemperature
 from hydro_iot.services.ports.logging import ILogging
 from hydro_iot.services.ports.sensors_gateway import ISensorGateway
@@ -16,6 +17,7 @@ from hydro_iot.services.ports.sensors_gateway import ISensorGateway
 
 class RaspberrySensorGateway(ISensorGateway):
     _log = inject.attr(ILogging)
+    system_state = inject.attr(SystemState)
 
     def __init__(self) -> None:
         self._log.info("Init sensor gateway")
@@ -43,26 +45,29 @@ class RaspberrySensorGateway(ISensorGateway):
         return result
 
     def get_temperature(self) -> WaterTemperature:
-        sensor = next(iter(Pi1Wire().find_all_sensors()), None)
+        with self.system_state.power_output_lock:
+            sensor = next(iter(Pi1Wire().find_all_sensors()), None)
 
-        if not sensor:
-            raise FileNotFoundError("Couldn't find 1-wire enable device.")
+            if not sensor:
+                raise FileNotFoundError("Couldn't find 1-wire enable device.")
 
-        return WaterTemperature(value=sensor.get_temperature())
+            return WaterTemperature(value=sensor.get_temperature())
 
     def get_conductivity(self) -> Conductivity:
-        GPIO.output(self.config.pins.tds_power_gpio, GPIO.HIGH)
-        sleep(0.5)
-        values = []
-        for _ in range(10):
-            result = self._adc.ADS1263_GetChannalValue(self.config.pins.tds_sensor_adc)
+        with self.system_state.power_output_lock:
+            try:
+                GPIO.output(self.config.pins.tds_power_gpio, GPIO.HIGH)
+                sleep(0.5)
+                values = []
+                for _ in range(10):
+                    result = self._adc.ADS1263_GetChannalValue(self.config.pins.tds_sensor_adc)
 
-            result = self._adc_result_to_voltage(result)
+                    result = self._adc_result_to_voltage(result)
 
-            values.append(result)
-            sleep(0.05)
-
-        GPIO.output(self.config.pins.tds_power_gpio, GPIO.LOW)
+                    values.append(result)
+                    sleep(0.05)
+            finally:
+                GPIO.output(self.config.pins.tds_power_gpio, GPIO.LOW)
 
         value = sum(values) / 10.0
 
@@ -75,18 +80,20 @@ class RaspberrySensorGateway(ISensorGateway):
         return Conductivity(microsiemens_per_meter=ms)
 
     def get_ph(self) -> PH:
-        GPIO.output(self.config.pins.ph_power_gpio, GPIO.HIGH)
-        sleep(0.5)
-        values = []
-        for _ in range(10):
-            result = self._adc.ADS1263_GetChannalValue(self.config.pins.ph_sensor_adc)
+        with self.system_state.power_output_lock:
+            try:
+                GPIO.output(self.config.pins.ph_power_gpio, GPIO.HIGH)
+                sleep(0.5)
+                values = []
+                for _ in range(10):
+                    result = self._adc.ADS1263_GetChannalValue(self.config.pins.ph_sensor_adc)
 
-            result = self._adc_result_to_voltage(result)
+                    result = self._adc_result_to_voltage(result)
 
-            values.append(result)
-            sleep(0.05)
-
-        GPIO.output(self.config.pins.ph_power_gpio, GPIO.LOW)
+                    values.append(result)
+                    sleep(0.05)
+            finally:
+                GPIO.output(self.config.pins.ph_power_gpio, GPIO.LOW)
 
         value = sum(values) / 10.0
 
