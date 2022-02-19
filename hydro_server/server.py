@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from datetime import datetime
 
 import cysystemd.daemon as daemon
 import pika
@@ -36,15 +37,16 @@ def handle_sensor_delivery(channel, method, header, body):
     """Called when we receive a message from RabbitMQ"""
     body = json.loads(body.decode())
     routing_key = method.routing_key
+    timestamp = datetime.fromtimestamp(header.timestamp)
 
     if routing_key == "measurement.temperature":
-        handle_temperature(body, header.timestamp)
+        handle_temperature(body, timestamp)
     elif routing_key == "measurement.ph":
-        handle_ph(body, header.timestamp)
+        handle_ph(body, timestamp)
     elif routing_key == "measurement.ec":
-        handle_ec(body, header.timestamp)
+        handle_ec(body, timestamp)
     elif routing_key == "measurement.pressure":
-        handle_pressure(body, header.timestamp)
+        handle_pressure(body, timestamp)
     else:
         return
 
