@@ -50,9 +50,14 @@ def config(binder):
     )
 
 
-inject.configure(config)
+def main():
+    inject.configure(config)
 
-try:
-    start_service()
-finally:
-    GPIO.cleanup()
+    try:
+        start_service()
+    finally:
+        GPIO.cleanup()
+
+
+if __name__ == "__main__":
+    main()

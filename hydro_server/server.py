@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 import cysystemd.daemon as daemon
 import pika
@@ -37,7 +37,7 @@ def handle_sensor_delivery(channel, method, header, body):
     """Called when we receive a message from RabbitMQ"""
     body = json.loads(body.decode())
     routing_key = method.routing_key
-    timestamp = datetime.fromtimestamp(header.timestamp)
+    timestamp = datetime.fromtimestamp(header.timestamp, tz=timezone.utc)
 
     if routing_key == "measurement.temperature":
         handle_temperature(body, timestamp)
@@ -94,29 +94,33 @@ def insert_data(sql_statement, values):
             connection.close()
 
 
-load_dotenv()
+def main():
+    load_dotenv()
+
+    parameters = pika.ConnectionParameters(
+        host=os.environ.get("RABBITMQ_HOST"),
+        credentials=pika.PlainCredentials(
+            username=os.environ.get("RABBITMQ_USERNAME"), password=os.environ.get("RABBITMQ_PASSWORD")
+        ),
+    )
+    connection = pika.SelectConnection(parameters, on_open_callback=on_open)
+
+    try:
+        logging.info("Startup complete")
+        # Tell systemd that our service is ready
+        daemon.notify(daemon.Notification.READY)
+
+        # Loop so we can communicate with RabbitMQ
+        connection.ioloop.start()
+    except KeyboardInterrupt:
+        # Gracefully close the connection
+        connection.close()
+        # Loop until we're fully closed, will stop on its own
+        connection.ioloop.start()
 
 
-parameters = pika.ConnectionParameters(
-    host=os.environ.get("RABBITMQ_HOST"),
-    credentials=pika.PlainCredentials(
-        username=os.environ.get("RABBITMQ_USERNAME"), password=os.environ.get("RABBITMQ_PASSWORD")
-    ),
-)
-connection = pika.SelectConnection(parameters, on_open_callback=on_open)
-
-try:
-    logging.info("Startup complete")
-    # Tell systemd that our service is ready
-    daemon.notify(daemon.Notification.READY)
-
-    # Loop so we can communicate with RabbitMQ
-    connection.ioloop.start()
-except KeyboardInterrupt:
-    # Gracefully close the connection
-    connection.close()
-    # Loop until we're fully closed, will stop on its own
-    connection.ioloop.start()
+if __name__ == "__main__":
+    main()
 
 
 # ip = "192.168.1.138"

@@ -17,6 +17,8 @@ python-dotenv = "^0.19.2"
 cysystemd = "^1.5.2"
 spidev = "^3.5"
 janus = "^1.0.0"
+Kivy = {extras = ["base"], version = "^2.0.0"}
+psycopg2 = "^2.9.3"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.16.0"
@@ -38,3 +40,8 @@ line-length = 120
 [tool.pytest.ini_options]
 addopts = "--black"
 testpaths = ["tests"]
+
+[tool.poetry.scripts]
+iot = "hydro_iot.__main__:main"
+server = "hydro_server.server:main"
+app = "hydro_app.main:main"
