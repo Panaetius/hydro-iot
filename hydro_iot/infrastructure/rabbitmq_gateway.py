@@ -69,7 +69,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
 
     @property
     def current_timestamp(self):
-        return int(datetime.timestamp(datetime.now()))
+        return int(datetime.timestamp(datetime.utcnow()))
 
     def send_temperature_status(self, temperature: WaterTemperature):
         if not self.sensor_data_channel:
