@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from threading import Lock, Thread
 from typing import Callable
 
@@ -75,6 +76,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 exchange="sensor_data_exchange",
                 routing_key="measurement.temperature",
                 body=json.dumps({"temperature": temperature.value}),
+                properties=pika.BasicProperties(timestamp=datetime.now()),
                 mandatory=True,
             )
 
@@ -87,6 +89,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 exchange="sensor_data_exchange",
                 routing_key="measurement.ph",
                 body=json.dumps({"ph": ph.value}),
+                properties=pika.BasicProperties(timestamp=datetime.now()),
                 mandatory=True,
             )
 
@@ -99,6 +102,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 exchange="sensor_data_exchange",
                 routing_key="measurement.ec",
                 body=json.dumps({"ec": ec.microsiemens_per_meter}),
+                properties=pika.BasicProperties(timestamp=datetime.now()),
                 mandatory=True,
             )
 
@@ -111,6 +115,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 exchange="sensor_data_exchange",
                 routing_key="measurement.pressure",
                 body=json.dumps({"pressure": pressure.bar}),
+                properties=pika.BasicProperties(timestamp=datetime.now()),
                 mandatory=True,
             )
 
@@ -123,6 +128,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 exchange="sensor_data_exchange",
                 routing_key=f"event.boxes.spray.{index}",
                 body=json.dumps({"index": index, "duration": duration}),
+                properties=pika.BasicProperties(timestamp=datetime.now()),
                 mandatory=True,
             )
 
@@ -135,6 +141,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 exchange="sensor_data_exchange",
                 routing_key=f"event.adjustment.ph.up",
                 body=json.dumps({"amount": amount}),
+                properties=pika.BasicProperties(timestamp=datetime.now()),
                 mandatory=True,
             )
 
@@ -147,6 +154,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 exchange="sensor_data_exchange",
                 routing_key=f"event.adjustment.ph.down",
                 body=json.dumps({"amount": amount}),
+                properties=pika.BasicProperties(timestamp=datetime.now()),
                 mandatory=True,
             )
 
@@ -159,6 +167,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 exchange="sensor_data_exchange",
                 routing_key=f"event.adjustment.ec.down",
                 body=json.dumps({"amount": amount}),
+                properties=pika.BasicProperties(timestamp=datetime.now()),
                 mandatory=True,
             )
 
@@ -173,6 +182,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 body=json.dumps(
                     {"amount_grow": amount_grow, "amount_micro": amount_micro, "amount_bloom": amount_bloom}
                 ),
+                properties=pika.BasicProperties(timestamp=datetime.now()),
                 mandatory=True,
             )
 
@@ -185,6 +195,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 exchange="sensor_data_exchange",
                 routing_key=f"event.adjustment.pressure.up",
                 body=json.dumps({"bar": pressure.bar}),
+                properties=pika.BasicProperties(timestamp=datetime.now()),
                 mandatory=True,
             )
 
@@ -197,6 +208,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 exchange="sensor_data_exchange",
                 routing_key=f"event.exception.pressure.drop",
                 body=json.dumps({"drop": pressure_drop}),
+                properties=pika.BasicProperties(timestamp=datetime.now()),
                 mandatory=True,
             )
 
@@ -209,5 +221,6 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 exchange="sensor_data_exchange",
                 routing_key=f"event.exception.pressure.not_increasing",
                 body="",
+                properties=pika.BasicProperties(timestamp=datetime.now()),
                 mandatory=True,
             )
