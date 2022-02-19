@@ -48,12 +48,12 @@ class PumpGateway(IPumpGateway):
             max_measured_pressure = current_pressure
             last_max_measured = 0
 
-            GPIO.output(self.config.pins.pressure_pump, GPIO.HIGH)
-
             try:
+                GPIO.output(self.config.pins.pressure_pump, GPIO.HIGH)
+
                 while current_pressure < target_pressure.bar:
                     # Moving exponential average to smooth measurement
-                    current_pressure = (current_pressure + self.sensor_gateway.get_pressure().bar) / 2
+                    current_pressure = 0.6 * current_pressure + 0.4 * self.sensor_gateway.get_pressure().bar
 
                     if current_pressure > max_measured_pressure:
                         last_max_measured = 0

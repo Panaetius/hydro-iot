@@ -41,9 +41,6 @@ def start_service(
     message_queue_subscriber: IMessageQueueSubscriber,
 ):
     logging.info("Starting up ...")
-    logging.info("Startup complete")
-    # Tell systemd that our service is ready
-    daemon.notify(daemon.Notification.READY)
 
     logging.info("Setting up scheduler")
     scheduler.repeat_job_at_interval(
@@ -111,5 +108,9 @@ def start_service(
     # message_queue.start_listening()
 
     logging.info("Starting async event loop")
+
+    logging.info("Startup complete")
+    # Tell systemd that our service is ready
+    daemon.notify(daemon.Notification.READY)
 
     asyncio.run(start_tasks())
