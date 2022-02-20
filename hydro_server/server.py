@@ -48,6 +48,7 @@ def handle_sensor_delivery(channel, method, header, body):
     elif routing_key == "measurement.pressure":
         handle_pressure(body, timestamp)
     else:
+        channel.basic_nack(delivery_tag=method.delivery_tag)
         return
 
     channel.basic_ack(delivery_tag=method.delivery_tag)

@@ -1,31 +1,153 @@
 #:kivy 1.0.9
 
+<HydroIoT>:
+    orientation: "vertical"
+    HydroScreenManager:
+        id: sm
+        MainScreen:
+        ControlScreen:
+        SettingsScreen:
+    BoxLayout:
+        orientation:"horizontal"
+        size_hint_y: 0.1
+        Button:
+            text: "Values"
+            font_size:'40sp'
+            on_release:
+                app.root.ids.sm.switch_screen("values")
+        Button:
+            text: "Control"
+            font_size:'40sp'
+            on_release:
+                app.root.ids.sm.switch_screen("control")
+        Button:
+            text: "Settings"
+            font_size:'40sp'
+            on_release:
+                app.root.ids.sm.switch_screen("settings")
+
 <MainScreen>:
-    rows: 4
-    cols: 2
-    padding: 10
-    spacing: 10
-    Label:
-        font_size:'40sp'
-        text: "Temperature"
-    Label:
-        font_size:'40sp'
-        id: temperature
-    Label:
-        font_size:'40sp'
-        text: "PH"
-    Label:
-        font_size:'40sp'
-        id: ph
-    Label:
-        font_size:'40sp'
-        text: "EC"
-    Label:
-        font_size:'40sp'
-        id: ec
-    Label:
-        font_size:'40sp'
-        text: "Pressure"
-    Label:
-        font_size:'40sp'
-        id: pressure
+    id: values_screen
+    name: "values"
+    # temperature: temperature
+    # ph: ph
+    # ec: ec
+    # pressure: pressure
+    GridLayout:
+        rows: 4
+        cols: 2
+        padding: 10
+        spacing: 10
+        Label:
+            font_size:'40sp'
+            text: "Temperature"
+        Label:
+            font_size:'40sp'
+            id: temperature
+            text: str(root.temperature)
+        Label:
+            font_size:'40sp'
+            text: "PH"
+        Label:
+            font_size:'40sp'
+            id: ph
+            text: str(root.ph)
+        Label:
+            font_size:'40sp'
+            text: "EC"
+        Label:
+            font_size:'40sp'
+            id: ec
+            text: str(root.ec)
+        Label:
+            font_size:'40sp'
+            text: "Pressure"
+        Label:
+            font_size:'40sp'
+            id: pressure
+            text: str(root.pressure)
+
+<ControlScreen>:
+    name: "control"
+    GridLayout:
+        id: layout
+        rows: 4
+        cols: 2
+        padding: 10
+        spacing: 10
+        Button:
+            id: pause_button
+            text:"Pause"
+            font_size:'40sp'
+        Button:
+            id: spray_button
+            text:"Spray Boxes"
+            font_size:'40sp'
+        Button:
+            id: ph_up_button
+            text:"pH up"
+            font_size:'40sp'
+        Button:
+            id: ph_down_button
+            text:"pH down"
+            font_size:'40sp'
+        Button:
+            id: ec_up_button
+            text:"EC up"
+            font_size:'40sp'
+        Button:
+            id: ec_down_button
+            text:"EC down"
+            font_size:'40sp'
+        Button:
+            id: empty_tank_button
+            text:"Empty Tank"
+            font_size:'40sp'
+        Button:
+            id: pressure_up_button
+            text:"Pressure up"
+            font_size:'40sp'
+
+<SettingsScreen>:
+    id: settings_screen
+    name: "settings"
+    GridLayout:
+        id: layout
+        rows: 4
+        cols: 2
+        padding: 10
+        spacing: 10
+        Label:
+            font_size:'40sp'
+            text: "Host"
+        TextInput:
+            font_size:'40sp'
+            id: host_field
+            multiline: False
+            text: root.host
+            on_text: root.host = self.text
+        Label:
+            font_size:'40sp'
+            text: "User"
+        TextInput:
+            font_size:'40sp'
+            id: user_field
+            multiline: False
+            text: root.user
+            on_text: root.user = self.text
+        Label:
+            font_size:'40sp'
+            text: "Password"
+        TextInput:
+            font_size:'40sp'
+            id: password_field
+            multiline: False
+            password: True
+            text: root.password
+            on_text: root.password = self.text
+        Label:
+            font_size:'40sp'
+            text: ""
+        Button:
+            text: "Save"
+            on_release: root.save_settings()
