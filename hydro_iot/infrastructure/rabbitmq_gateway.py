@@ -235,7 +235,9 @@ class RabbitMQGateway(IMessageQueuePublisher):
     def handle_rpc(self, channel: pika.channel.Channel, method, props, body):
         routing_key = method.routing_key
         self.logging.info(f"Got RPC command: {routing_key}")
-        body = json.loads(body)
+
+        if body:
+            body = json.loads(body)
 
         try:
             if routing_key == "rpc.get_config":
