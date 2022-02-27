@@ -232,6 +232,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
 
     def handle_rpc(self, channel: pika.channel.Channel, method, props, body):
         routing_key = method.routing_key
+        self.logging.info(f"Got RPC command: {routing_key}")
         body = json.loads(body)
 
         try:
@@ -287,8 +288,9 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 channel.basic_nack(delivery_tag=method.delivery_tag)
                 return
 
+            self.logging.info(f"Sending reply: {response}")
             channel.basic_publish(
-                exchange="rpc_data_exchange",
+                exchange="",
                 routing_key=props.reply_to,
                 properties=pika.BasicProperties(correlation_id=props.correlation_id),
                 body=response,

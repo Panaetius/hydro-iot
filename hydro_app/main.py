@@ -163,7 +163,7 @@ class MainScreen(Screen):
         print("RPC queue declared")
         global rpc_queue
         rpc_queue = frame.method.queue
-        channel.queue_bind(rpc_queue, exchange="rpc_data_exchange")
+        channel.queue_bind(rpc_queue, exchange="")
         rpc_channel.basic_consume(rpc_queue, on_message_callback=self.handle_rpc_callback, auto_ack=True)
 
         # get initial readings
