@@ -290,7 +290,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
 
             self.logging.info(f"Sending reply: {response}")
             channel.basic_publish(
-                exchange="",
+                exchange="rpc_callback",
                 routing_key=props.reply_to,
                 properties=pika.BasicProperties(correlation_id=props.correlation_id),
                 body=response,
