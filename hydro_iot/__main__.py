@@ -45,9 +45,9 @@ def config(binder):
     binder.bind_to_constructor(IPumpGateway, lambda: PumpGateway())
     binder.bind_to_constructor(ILogging, lambda: Logging())
 
-    binder.bind_to_constructor(
-        IConfig, lambda: Config.load_config(["config.example.hocon", "/etc/hydro_iot/config.hocon"])
-    )
+    config_path = "/etc/hydro_iot/config.hocon"
+    binder.bind("config_path", config_path)
+    binder.bind_to_constructor(IConfig, lambda: Config.load_config(["config.example.hocon", config_path]))
 
 
 def main():

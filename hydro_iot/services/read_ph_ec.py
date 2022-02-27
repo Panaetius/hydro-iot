@@ -20,11 +20,13 @@ def read_ph_conductivity(
     logging: ILogging,
 ):
     ph = sensor_gateway.get_ph()
+    system_state.last_ph = ph
     logging.info(f"PH: {ph.value}")
 
     sleep(0.5)
 
     ec = sensor_gateway.get_conductivity()
+    system_state.last_ec = ec
     logging.info(f"EC: {ec.microsiemens_per_meter} µS/m")
 
     message_gateway.send_ph_value(ph)

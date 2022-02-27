@@ -55,7 +55,7 @@ def increase_pressure(
     message_queue: IMessageQueuePublisher,
     config: IConfig,
 ):
-    if system_state.increasing_pressure:
+    if system_state.increasing_pressure or system_state.paused:
         return
 
     if system_state.pressure_error and not _check_pressure_error(system_state, config, sensor_gateway, logging):

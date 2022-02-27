@@ -17,7 +17,7 @@ def spray_boxes(
     spray_gateway: ISprayGateway,
     sensor_gateway: ISensorGateway,
 ):
-    if system_state.spraying_boxes:
+    if system_state.spraying_boxes or system_state.paused:
         return
     system_state.spraying_boxes = True
 

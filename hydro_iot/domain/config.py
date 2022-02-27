@@ -62,3 +62,9 @@ class IConfig:
     pins: Pins
     levels: Levels
     amounts: Amounts
+
+    def save_config(self, path: str):
+        raise NotImplementedError()
+
+    def to_json(self) -> str:
+        raise NotImplementedError()

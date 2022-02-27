@@ -18,6 +18,8 @@ def increase_ph(
     message_queue: IMessageQueuePublisher,
     config: IConfig,
 ):
+    if system_state.paused:
+        return
     system_state.last_fertilizer_ph_adjustment = monotonic()
     pump_gateway.raise_ph(config.amounts.ph_increase_ml)
     logging.info(f"Increased PH with {config.amounts.ph_increase_ml} ml solution")
@@ -32,6 +34,8 @@ def decrease_ph(
     message_queue: IMessageQueuePublisher,
     config: IConfig,
 ):
+    if system_state.paused:
+        return
     system_state.last_fertilizer_ph_adjustment = monotonic()
     pump_gateway.lower_ph(config.amounts.ph_decrease_ml)
     logging.info(f"Lowered PH with {config.amounts.ph_decrease_ml} ml solution")
@@ -46,6 +50,8 @@ def increase_ec(
     message_queue: IMessageQueuePublisher,
     config: IConfig,
 ):
+    if system_state.paused:
+        return
     system_state.last_fertilizer_ph_adjustment = monotonic()
     pump_gateway.increase_fertilizer(
         flora_grow_ml=config.amounts.flora_grow_ml,
@@ -70,6 +76,8 @@ def decrease_ec(
     message_queue: IMessageQueuePublisher,
     config: IConfig,
 ):
+    if system_state.paused:
+        return
     system_state.last_fertilizer_ph_adjustment = monotonic()
     pump_gateway.lower_fertilizer(amount_ml=config.amounts.fresh_water_ml)
     logging.info(f"Decreased EC by adding {config.amounts.fresh_water_ml} ml fresh water.")

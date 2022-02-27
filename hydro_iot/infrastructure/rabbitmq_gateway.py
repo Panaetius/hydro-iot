@@ -5,12 +5,14 @@ from typing import Callable
 
 import inject
 import pika
+import pika.channel
 
 from hydro_iot.domain.conductivity import Conductivity
 from hydro_iot.domain.config import IConfig
 from hydro_iot.domain.ph import PH
 from hydro_iot.domain.pressure import Pressure
 from hydro_iot.domain.temperature import WaterTemperature
+from hydro_iot.domain.timing import SprayTiming
 from hydro_iot.services.ports.logging import ILogging
 from hydro_iot.services.ports.message_queue import (
     IMessageQueuePublisher,
@@ -21,6 +23,7 @@ from hydro_iot.services.ports.message_queue import (
 class RabbitMQGateway(IMessageQueuePublisher):
     config: IConfig = inject.attr(IConfig)
     logging: ILogging = inject.attr(ILogging)
+    subscriber: IMessageQueueSubscriber = inject.attr(IMessageQueueSubscriber)
     publish_lock: Lock = Lock()
 
     def __init__(self) -> None:
@@ -52,16 +55,14 @@ class RabbitMQGateway(IMessageQueuePublisher):
         self.logging.info("Starting messagequeue io loop")
         self.sensor_data_channel = self.publish_connection.channel()
         self.event_data_channel = self.publish_connection.channel()
+        self.rpc_data_channel = self.publish_connection.channel()
 
         self.sensor_data_channel.queue_declare(queue="sensor_data")
         self.event_data_channel.queue_declare(queue="event_data")
-
-    def _open_callback(self, connection):
-        for (queue, key), callback in self.channels.items():
-            channel = connection.channel()
-            channel.queue_declare(queue)
-            channel.queue_bind(queue=queue, routing_key=key)
-            # channel.basic_consume(queue=queue, on_message_callback=callback, auto_ack=True)
+        self.rpc_data_channel.queue_declare(queue="rpc_data")
+        self.rpc_data_channel.basic_qos(prefetch_count=1)
+        self.rpc_data_channel.basic_consume(queue="rpc_data", on_message_callback=self.handle_rpc)
+        Thread(target=self.rpc_data_channel.start_consuming).start()
 
     def __del__(self):
         self.consume_connection.close()
@@ -228,3 +229,71 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 properties=pika.BasicProperties(timestamp=self.current_timestamp),
                 mandatory=True,
             )
+
+    def handle_rpc(self, channel: pika.channel.Channel, method, props, body):
+        routing_key = method.routing_key
+        body = json.loads(body)
+
+        try:
+            if routing_key == "rpc.get_config":
+                response = self.subscriber.get_config()
+            elif routing_key == "rpc.set_minimum_ph":
+                self.subscriber.set_minimum_ph_level(PH(value=body["ph"]))
+                response = ""
+            elif routing_key == "rpc.set_maximum_ph":
+                self.subscriber.set_maximum_ph_level(PH(value=body["ph"]))
+                response = ""
+            elif routing_key == "rpc.set_minimum_ec":
+                self.subscriber.set_minimum_conductivity_level(Conductivity(microsiemens_per_meter=body["ec"]))
+                response = ""
+            elif routing_key == "rpc.set_maximum_ec":
+                self.subscriber.set_maximum_conductivity_level(Conductivity(microsiemens_per_meter=body["ec"]))
+                response = ""
+            elif routing_key == "rpc.set_minimum_pump_pressure":
+                self.subscriber.set_minimum_pump_pressure(Pressure(bar=body["pressure"]))
+                response = ""
+            elif routing_key == "rpc.set_maximum_pump_pressure":
+                self.subscriber.set_target_pump_pressure(Pressure(bar=body["pressure"]))
+                response = ""
+            elif routing_key == "rpc.set_spray_timing":
+                self.subscriber.set_spray_timing(
+                    SprayTiming(duration_ms=body["duration"], interval_ms=body["interval"])
+                )
+                response = ""
+            elif routing_key == "rpc.pause_system":
+                self.subscriber.pause_system()
+                response = ""
+            elif routing_key == "rpc.unpause_system":
+                self.subscriber.unpause_system()
+                response = ""
+            elif routing_key == "rpc.get_system_state":
+                response = self.subscriber.pause_system()
+            elif routing_key == "rpc.spray_boxes":
+                response = self.subscriber.spray_boxes()
+            elif routing_key == "rpc.ph_up":
+                response = self.subscriber.increase_ph()
+            elif routing_key == "rpc.ph_down":
+                response = self.subscriber.decrease_ph()
+            elif routing_key == "rpc.ec_up":
+                response = self.subscriber.increase_ec()
+            elif routing_key == "rpc.ec_down":
+                response = self.subscriber.decrease_ec()
+            elif routing_key == "rpc.empty_tank":
+                response = self.subscriber.empty_tank()
+            elif routing_key == "rpc.pressure_up":
+                response = self.subscriber.increase_pressure()
+            else:
+                self.logging.error(f"Got unknown RPC request: {routing_key}, {body}")
+                channel.basic_nack(delivery_tag=method.delivery_tag)
+                return
+
+            channel.basic_publish(
+                exchange="rpc_data_exchange",
+                routing_key=props.reply_to,
+                properties=pika.BasicProperties(correlation_id=props.correlation_id),
+                body=response,
+            )
+            channel.basic_ack(delivery_tag=method.delivery_tag)
+        except Exception as e:
+            self.logging.error(f"RPC Error: {e}")
+            channel.basic_nack(delivery_tag=method.delivery_tag)

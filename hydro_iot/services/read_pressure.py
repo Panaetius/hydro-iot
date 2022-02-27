@@ -20,6 +20,7 @@ def read_pressure(
     config: IConfig,
 ):
     pressure = sensor_gateway.get_pressure()
+    system_state.last_pressure = pressure
 
     if not system_state.current_pressure_level:
         # Set current pressure on first measurement

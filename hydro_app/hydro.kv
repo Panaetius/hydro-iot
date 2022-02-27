@@ -101,42 +101,50 @@
                 orientation: "horizontal"
                 Button:
                     id: pause_start_button
-                    text:"Pause"
+                    text:root.pause_button_text
                     font_size:'40sp'
+                    on_release: root.pause_button_click()
                 Button:
                     id: spray_button
                     text:"Spray Boxes"
                     font_size:'40sp'
+                    on_release: root.spray_boxes_click()
             BoxLayout:
                 orientation: "horizontal"
                 Button:
                     id: ph_up_button
                     text:"pH up"
                     font_size:'40sp'
+                    on_release: root.ph_up_click()
                 Button:
                     id: ph_down_button
                     text:"pH down"
                     font_size:'40sp'
+                    on_release: root.ph_down_click()
             BoxLayout:
                 orientation: "horizontal"
                 Button:
                     id: ec_up_button
                     text:"EC up"
                     font_size:'40sp'
+                    on_release: root.ec_up_click()
                 Button:
                     id: ec_down_button
                     text:"EC down"
                     font_size:'40sp'
+                    on_release: root.ec_down_click()
             BoxLayout:
                 orientation: "horizontal"
                 Button:
                     id: empty_tank_button
                     text:"Empty Tank"
                     font_size:'40sp'
+                    on_release: root.empty_tank_click()
                 Button:
                     id: pressure_up_button
                     text:"Pressure up"
                     font_size:'40sp'
+                    on_release: root.pressure_up_click()
             BoxLayout:
                 orientation: "horizontal"
                 Label:
@@ -331,6 +339,7 @@
             Button:
                 text: "Update Parameters"
                 font_size:'40sp'
+                on_release: root.update_parameters_click()
 
 
 <SettingsScreen>:

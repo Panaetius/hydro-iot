@@ -67,3 +67,39 @@ class IMessageQueueSubscriber(ABC):
 
     def set_spray_timing(self, timing: SprayTiming):
         raise NotImplementedError()
+
+    def set_box_status(self, box1_status: bool, box2_status: bool, box3_status: bool):
+        raise NotImplementedError()
+
+    def get_config(self):
+        raise NotImplementedError()
+
+    def pause_system(self):
+        raise NotImplementedError()
+
+    def unpause_system(self):
+        raise NotImplementedError()
+
+    def get_system_state(self):
+        raise NotImplementedError()
+
+    def spray_boxes(self):
+        raise NotImplementedError()
+
+    def increase_ph(self):
+        raise NotImplementedError()
+
+    def decrease_ph(self):
+        raise NotImplementedError()
+
+    def increase_ec(self):
+        raise NotImplementedError()
+
+    def decrease_ec(self):
+        raise NotImplementedError()
+
+    def empty_tank(self):
+        raise NotImplementedError()
+
+    def increase_pressure(self):
+        raise NotImplementedError()

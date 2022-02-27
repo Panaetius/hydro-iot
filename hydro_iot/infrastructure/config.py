@@ -28,3 +28,6 @@ class Config(IConfig):
 
     def save_config(self, path: str):
         dataconf.dump(path, self, out="properties")
+
+    def to_json(self) -> str:
+        return dataconf.dumps(self, out="json")
