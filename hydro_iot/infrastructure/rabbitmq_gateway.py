@@ -295,7 +295,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 channel.basic_nack(delivery_tag=method.delivery_tag)
                 return
 
-            self.logging.info(f"Sending reply: {response}")
+            self.logging.info(f"Sending reply: {response}, {props.reply_to}")
             channel.basic_publish(
                 exchange="rpc_callback",
                 routing_key=props.reply_to,

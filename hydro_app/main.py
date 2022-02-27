@@ -19,7 +19,7 @@ from kivy.uix.screenmanager import Screen, ScreenManager
 from hydro_app.gauge import DialGauge
 
 stderr_handler = logging.StreamHandler(sys.stderr)
-logging.getLogger("pika").setLevel(logging.DEBUG)
+logging.getLogger("pika").setLevel(logging.INFO)
 logging.getLogger("pika").addHandler(stderr_handler)
 
 
