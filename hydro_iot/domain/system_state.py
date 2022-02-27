@@ -26,4 +26,12 @@ class SystemState:
     paused: bool = False
 
     def to_json(self) -> str:
-        return json.dumps(asdict(self))
+        result = {
+            "paused": self.paused,
+            "last_pressure": self.last_pressure.bar if self.last_pressure else None,
+            "last_ph": self.last_ph.value if self.last_ph else None,
+            "last_ec": self.last_ec.microsiemens_per_meter if self.last_ec else None,
+            "last_temperature": self.last_temperature.value if self.last_temperature else None,
+        }
+
+        return json.dumps(result)
