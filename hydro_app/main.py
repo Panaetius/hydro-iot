@@ -51,8 +51,8 @@ class ControlScreen(Screen):
     paused = ObjectProperty(False)
     pause_button_text = StringProperty("Pause")
 
-    def set_config_values(self, body):
-        self.spray_duration = body["timings"]["spray_box_timings_ms"][0] / 1000
+    def set_config_values(self, channel, method, props, body):
+        self.spray_duration = body["timings"]["spray_box_timings_ms"][0]
         self.spray_interval = body["timings"]["spray_box_interval_ms"] / (60 * 1000)
         self.min_ph = body["levels"]["min_ph"]
         self.max_ph = body["levels"]["max_ph"]
@@ -60,6 +60,13 @@ class ControlScreen(Screen):
         self.max_ec = body["levels"]["max_ec"]
         self.min_pressure = body["levels"]["minimum_pressure_bar"]
         self.max_pressure = body["levels"]["maximum_pressure_bar"]
+
+        App.get_running_app().root.ids.sm.get_screen("values").min_ph = self.min_ph
+        App.get_running_app().root.ids.sm.get_screen("values").max_ph = self.max_ph
+        App.get_running_app().root.ids.sm.get_screen("values").min_ec = self.min_ec
+        App.get_running_app().root.ids.sm.get_screen("values").max_ec = self.max_ec
+        App.get_running_app().root.ids.sm.get_screen("values").min_pressure = self.min_pressure
+        App.get_running_app().root.ids.sm.get_screen("values").max_pressure = self.max_pressure
 
     def set_system_state(self, body):
         self.paused = body["paused"]
@@ -76,10 +83,12 @@ class ControlScreen(Screen):
     def pause_button_click(self):
         if self.paused:
             App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
-                "unpause_system", "", self.set_unpaused
+                "unpause_system", "", lambda c, m, p, b: self.set_unpaused(c, m, p, b)
             )
         else:
-            App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request("pause_system", "", self.set_paused)
+            App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
+                "pause_system", "", lambda c, m, p, b: self.set_paused(c, m, p, b)
+            )
 
     def spray_boxes_click(self):
         App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request("spray_boxes", "")
@@ -132,11 +141,18 @@ class MainScreen(Screen):
     ec = ObjectProperty(1321)
     pressure = ObjectProperty(6.53)
 
+    min_ph = ObjectProperty(4)
+    max_ph = ObjectProperty(8)
+    min_ec = ObjectProperty(0)
+    max_ec = ObjectProperty(2000)
+    min_pressure = ObjectProperty(0)
+    max_pressure = ObjectProperty(15)
+
     connection = None
+    pending_callbacks = dict()
 
     def __init__(self, **kw):
         self.start_mq_listener()
-        self.pending_callbacks = dict()
         super().__init__(**kw)
 
     def on_open(self, connection: pika.SelectConnection):
@@ -169,15 +185,24 @@ class MainScreen(Screen):
 
         # get initial readings
         print("Get initial readings")
-        sleep(5)
-        self.send_rpc_request("get_system_state", "", self.handle_initial_values)
-        self.send_rpc_request(
-            "get_config", "", App.get_running_app().root.ids.sm.get_screen("control").set_config_values
-        )
+
+        def _startup():
+            sleep(5)
+            self.send_rpc_request(
+                "get_system_state",
+                "",
+                lambda ch, method, properties, body: self.handle_initial_values(ch, method, properties, body),
+            )
+            sleep(1)
+            self.send_rpc_request(
+                "get_config", "", App.get_running_app().root.ids.sm.get_screen("control").set_config_values
+            )
+
+        Thread(target=_startup).start()
 
     def send_rpc_request(self, method, body: str, callback: Optional[Callable] = None):
         corr_id = uuid.uuid4().hex
-        print(f"---\n---\n---\nSending rpc request to {method}")
+        print(f"Sending rpc request to {method}")
         self.pending_callbacks[corr_id] = callback
 
         rpc_channel.basic_publish(
@@ -188,15 +213,19 @@ class MainScreen(Screen):
         )
 
     def handle_rpc_callback(self, channel, method, props, body):
-        print(f"-----\n-----\n-----\nRPC callback gotten: {body}")
+        print(f"RPC callback gotten: {body}")
         try:
             callback = self.pending_callbacks.get(props.correlation_id)
 
+            if body:
+                body = json.loads(body)
+
             if callback:
-                callback(json.loads(body))
+                callback(channel, method, props, body)
             channel.basic_ack(delivery_tag=method.delivery_tag)
-        except:
+        except Exception as e:
             channel.basic_nack(delivery_tag=method.delivery_tag)
+            print(e)
         finally:
             if props.correlation_id in self.pending_callbacks:
                 del self.pending_callbacks[props.correlation_id]
@@ -211,12 +240,12 @@ class MainScreen(Screen):
 
         channel.basic_consume(frame.method.queue, self.handle_sensor_delivery)
 
-    def handle_initial_values(self, body):
+    def handle_initial_values(self, channel, method, props, body):
         print("Got initial values")
-        self.temperature = body.get("last_temperature", 20)
-        self.pressure = body.get("last_pressure", 6)
-        self.ph = body.get("last_ph", 6.2)
-        self.ec = body.get("last_ec", 1300)
+        self.temperature = round(body.get("last_temperature", 20), 2)
+        self.pressure = round(body.get("last_pressure", 6), 2)
+        self.ph = round(body.get("last_ph", 6.2), 2)
+        self.ec = round(body.get("last_ec", 1300), 0)
         App.get_running_app().root.ids.sm.get_screen("control").set_system_state(body)
 
     def handle_sensor_delivery(self, channel: pika.channel.Channel, method, header, body):

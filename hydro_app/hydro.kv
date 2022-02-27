@@ -58,8 +58,8 @@
             current_value: root.ph
             min_value: 4
             max_value: 8
-            min_ok_value: 5.7
-            max_ok_value: 6.5
+            min_ok_value: root.min_ph
+            max_ok_value: root.max_ph
         Label:
             font_size:'40sp'
             text: "EC"
@@ -69,8 +69,8 @@
             suffix: " µS/m"
             min_value: 0
             max_value: 2000
-            min_ok_value: 1100
-            max_ok_value: 1600
+            min_ok_value: root.min_ec
+            max_ok_value: root.max_ec
         Label:
             font_size:'40sp'
             text: "Pressure"
@@ -80,8 +80,8 @@
             suffix: " Bar"
             min_value: 0
             max_value: 15
-            min_ok_value: 6
-            max_ok_value: 9.5
+            min_ok_value: root.min_pressure
+            max_ok_value: root.max_pressure
 
 <ControlScreen>:
     name: "control"
@@ -179,6 +179,7 @@
                     id: spray_interval
                     min: 1
                     max: 30
+                    value: root.spray_interval
                     step: 0.5
                     size_hint_x: 0.9
                 Label:
@@ -195,6 +196,7 @@
                     id: spray_duration
                     min: 250
                     max: 15000
+                    value: root.spray_duration
                     step: 50
                     size_hint_x: 0.9
                 Label:
@@ -218,6 +220,7 @@
                             id: ph_min
                             min: 5
                             max: ph_max.value
+                            value: root.min_ph
                             step: 0.05
                             size_hint_x: 0.8
                         Label:
@@ -234,6 +237,7 @@
                             id: ph_max
                             min: ph_min.value
                             max: 7
+                            value: root.max_ph
                             step: 0.05
                             size_hint_x: 0.8
                         Label:
@@ -257,6 +261,7 @@
                             id: ec_min
                             min: 800
                             max: ec_max.value
+                            value: root.min_ec
                             step: 100
                             size_hint_x: 0.8
                         Label:
@@ -274,6 +279,7 @@
                             id: ec_max
                             min: ec_min.value
                             max: 2500
+                            value: root.max_ec
                             step: 100
                             size_hint_x: 0.8
                         Label:
@@ -298,6 +304,7 @@
                             id: pressure_min
                             min: 4
                             max: pressure_max.value
+                            value: root.min_pressure
                             step: 0.25
                             size_hint_x: 0.8
                         Label:
@@ -314,6 +321,7 @@
                             id: pressure_max
                             min: pressure_min.value
                             max: 10
+                            value: root.max_pressure
                             step: 0.25
                             size_hint_x: 0.8
                         Label:
@@ -329,6 +337,7 @@
                     id: picture_interval
                     min: 5
                     max: 60
+                    value: root.picture_interval
                     step: 5
                     size_hint_x: 0.9
                 Label:
