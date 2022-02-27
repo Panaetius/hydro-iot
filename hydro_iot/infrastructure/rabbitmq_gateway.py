@@ -55,7 +55,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
         self.logging.info("Starting messagequeue io loop")
         self.sensor_data_channel = self.publish_connection.channel()
         self.event_data_channel = self.publish_connection.channel()
-        self.rpc_data_channel = self.publish_connection.channel()
+        self.rpc_data_channel = self.consume_connection.channel()
 
         self.sensor_data_channel.queue_declare(queue="sensor_data")
         self.event_data_channel.queue_declare(queue="event_data")
