@@ -1,4 +1,5 @@
-#:kivy 1.0.9
+#:kivy 2.0.0
+#:include hydro_app/gauge.kv
 
 <HydroIoT>:
     orientation: "vertical"
@@ -41,72 +42,296 @@
         Label:
             font_size:'40sp'
             text: "Temperature"
-        Label:
-            font_size:'40sp'
+        DialGauge:
             id: temperature
-            text: str(root.temperature)
+            current_value: root.temperature
+            suffix: " °C"
+            min_value: 10
+            max_value: 30
+            min_ok_value: 15
+            max_ok_value: 26
         Label:
             font_size:'40sp'
             text: "PH"
-        Label:
-            font_size:'40sp'
+        DialGauge:
             id: ph
-            text: str(root.ph)
+            current_value: root.ph
+            min_value: 4
+            max_value: 8
+            min_ok_value: 5.7
+            max_ok_value: 6.5
         Label:
             font_size:'40sp'
             text: "EC"
-        Label:
-            font_size:'40sp'
+        DialGauge:
             id: ec
-            text: str(root.ec)
+            current_value: root.ec
+            suffix: " µS/m"
+            min_value: 0
+            max_value: 2000
+            min_ok_value: 1100
+            max_ok_value: 1600
         Label:
             font_size:'40sp'
             text: "Pressure"
-        Label:
-            font_size:'40sp'
+        DialGauge:
             id: pressure
-            text: str(root.pressure)
+            current_value: root.pressure
+            suffix: " Bar"
+            min_value: 0
+            max_value: 15
+            min_ok_value: 6
+            max_ok_value: 9.5
 
 <ControlScreen>:
     name: "control"
-    GridLayout:
-        id: layout
-        rows: 4
-        cols: 2
-        padding: 10
-        spacing: 10
-        Button:
-            id: pause_button
-            text:"Pause"
-            font_size:'40sp'
-        Button:
-            id: spray_button
-            text:"Spray Boxes"
-            font_size:'40sp'
-        Button:
-            id: ph_up_button
-            text:"pH up"
-            font_size:'40sp'
-        Button:
-            id: ph_down_button
-            text:"pH down"
-            font_size:'40sp'
-        Button:
-            id: ec_up_button
-            text:"EC up"
-            font_size:'40sp'
-        Button:
-            id: ec_down_button
-            text:"EC down"
-            font_size:'40sp'
-        Button:
-            id: empty_tank_button
-            text:"Empty Tank"
-            font_size:'40sp'
-        Button:
-            id: pressure_up_button
-            text:"Pressure up"
-            font_size:'40sp'
+    ScrollView:
+        do_scroll_x: False
+        do_scroll_y: True
+
+        GridLayout:
+            cols: 1
+            id: layout
+            padding: 10
+            spacing: 10
+            size_hint_y: None
+            height: self.minimum_height
+            row_default_height: "80dp"
+            BoxLayout:
+                orientation: "horizontal"
+                Button:
+                    id: pause_start_button
+                    text:"Pause"
+                    font_size:'40sp'
+                Button:
+                    id: spray_button
+                    text:"Spray Boxes"
+                    font_size:'40sp'
+            BoxLayout:
+                orientation: "horizontal"
+                Button:
+                    id: ph_up_button
+                    text:"pH up"
+                    font_size:'40sp'
+                Button:
+                    id: ph_down_button
+                    text:"pH down"
+                    font_size:'40sp'
+            BoxLayout:
+                orientation: "horizontal"
+                Button:
+                    id: ec_up_button
+                    text:"EC up"
+                    font_size:'40sp'
+                Button:
+                    id: ec_down_button
+                    text:"EC down"
+                    font_size:'40sp'
+            BoxLayout:
+                orientation: "horizontal"
+                Button:
+                    id: empty_tank_button
+                    text:"Empty Tank"
+                    font_size:'40sp'
+                Button:
+                    id: pressure_up_button
+                    text:"Pressure up"
+                    font_size:'40sp'
+            BoxLayout:
+                orientation: "horizontal"
+                Label:
+                    text: "Boxes"
+                    font_size:'40sp'
+                BoxLayout:
+                    orientation: "horizontal"
+                    Label:
+                        text: "1"
+                        font_size:'30sp'
+                    CheckBox:
+                        active: True
+                        #on_active: root.checkbox_click(self, self.active)
+                    Label:
+                        text: "2"
+                        font_size:'30sp'
+                    CheckBox:
+                        active: True
+                        #on_active: root.checkbox_click(self, self.active)
+                    Label:
+                        text: "3"
+                        font_size:'30sp'
+                    CheckBox:
+                        active: True
+                        #on_active: root.checkbox_click(self, self.active)
+            BoxLayout:
+                orientation: "horizontal"
+                Label:
+                    text: "Spray Interval"
+                    font_size:'40sp'
+                Slider:
+                    id: spray_interval
+                    min: 1
+                    max: 30
+                    step: 0.5
+                    size_hint_x: 0.9
+                Label:
+                    text: str(spray_interval.value)
+                    size_hint_x: 0.1
+                    font_size:'30sp'
+            BoxLayout:
+                orientation: "horizontal"
+                Label:
+                    text: "Spray Duration (ms)"
+                    font_size:'40sp'
+                    size_hint_x: 1
+                Slider:
+                    id: spray_duration
+                    min: 250
+                    max: 15000
+                    step: 50
+                    size_hint_x: 0.9
+                Label:
+                    text: str(spray_duration.value)
+                    size_hint_x: 0.1
+                    font_size:'30sp'
+            BoxLayout:
+                orientation: "horizontal"
+                Label:
+                    text: "Target pH"
+                    font_size:'40sp'
+                BoxLayout:
+                    orientation: "vertical"
+                    BoxLayout:
+                        orientation:"horizontal"
+                        Label:
+                            text: "min"
+                            font_size:'30sp'
+                            size_hint_x: 0.1
+                        Slider:
+                            id: ph_min
+                            min: 5
+                            max: ph_max.value
+                            step: 0.05
+                            size_hint_x: 0.8
+                        Label:
+                            text: str(ph_min.value)
+                            size_hint_x: 0.1
+                            font_size:'30sp'
+                    BoxLayout:
+                        orientation:"horizontal"
+                        Label:
+                            text: "max"
+                            font_size:'30sp'
+                            size_hint_x: 0.1
+                        Slider:
+                            id: ph_max
+                            min: ph_min.value
+                            max: 7
+                            step: 0.05
+                            size_hint_x: 0.8
+                        Label:
+                            text: str(ph_max.value)
+                            size_hint_x: 0.1
+                            font_size:'30sp'
+            BoxLayout:
+                orientation: "horizontal"
+                Label:
+                    text: "Target EC"
+                    font_size:'40sp'
+                BoxLayout:
+                    orientation: "vertical"
+                    BoxLayout:
+                        orientation:"horizontal"
+                        Label:
+                            text: "min"
+                            font_size:'30sp'
+                            size_hint_x: 0.1
+                        Slider:
+                            id: ec_min
+                            min: 800
+                            max: ec_max.value
+                            step: 100
+                            size_hint_x: 0.8
+                        Label:
+                            text: str(ec_min.value)
+                            size_hint_x: 0.1
+                            font_size:'30sp'
+                            size: self.texture_size
+                    BoxLayout:
+                        orientation:"horizontal"
+                        Label:
+                            text: "max"
+                            font_size:'30sp'
+                            size_hint_x: 0.1
+                        Slider:
+                            id: ec_max
+                            min: ec_min.value
+                            max: 2500
+                            step: 100
+                            size_hint_x: 0.8
+                        Label:
+                            text: str(ec_max.value)
+                            size_hint_x: 0.1
+                            font_size:'30sp'
+                            size: self.texture_size
+            BoxLayout:
+                orientation: "horizontal"
+                Label:
+                    text: "Pressure"
+                    font_size:'40sp'
+                BoxLayout:
+                    orientation: "vertical"
+                    BoxLayout:
+                        orientation:"horizontal"
+                        Label:
+                            text: "min"
+                            font_size:'30sp'
+                            size_hint_x: 0.1
+                        Slider:
+                            id: pressure_min
+                            min: 4
+                            max: pressure_max.value
+                            step: 0.25
+                            size_hint_x: 0.8
+                        Label:
+                            text: str(pressure_min.value)
+                            size_hint_x: 0.1
+                            font_size:'30sp'
+                    BoxLayout:
+                        orientation:"horizontal"
+                        Label:
+                            text: "max"
+                            font_size:'30sp'
+                            size_hint_x: 0.1
+                        Slider:
+                            id: pressure_max
+                            min: pressure_min.value
+                            max: 10
+                            step: 0.25
+                            size_hint_x: 0.8
+                        Label:
+                            text: str(pressure_max.value)
+                            size_hint_x: 0.1
+                            font_size:'30sp'
+            BoxLayout:
+                orientation: "horizontal"
+                Label:
+                    text: "Picture Interval"
+                    font_size:'40sp'
+                Slider:
+                    id: picture_interval
+                    min: 5
+                    max: 60
+                    step: 5
+                    size_hint_x: 0.9
+                Label:
+                    text: str(picture_interval.value)
+                    size_hint_x: 0.1
+                    font_size:'30sp'
+
+            Button:
+                text: "Update Parameters"
+                font_size:'40sp'
+
 
 <SettingsScreen>:
     id: settings_screen
@@ -150,4 +375,5 @@
             text: ""
         Button:
             text: "Save"
+            font_size:'40sp'
             on_release: root.save_settings()

@@ -1,0 +1,53 @@
+#:kivy 2.0.0
+#: import math math
+#: import DialGauge hydro_app.gauge.DialGauge
+#: import ew kivy.uix.effectwidget
+<DialGauge>:
+    id: dial_gauge
+    effects: ew.HorizontalBlurEffect(size=1), ew.VerticalBlurEffect(size=1), ew.FXAAEffect()
+    Widget:
+        id: ef_widget
+        canvas.before:
+            Color:
+                rgba: 0,0,0, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        canvas:
+            Color:
+                rgba: 1,0,0,1
+            Line:
+                width: 2.
+                circle:
+                    (self.center_x, self.y + root.padding/2, min(self.width/2, self.height) - root.padding - 12, -90.1, 180 * (root.min_ok_value - root.min_value)/ (root.max_value - root.min_value)-90, 2000)
+                cap: "square"
+                #texture: root.texture
+            Color:
+                rgba: 0, 1, 0, 1
+            Line:
+                width: 2.
+                circle:
+                    (self.center_x, self.y + root.padding/2, min(self.width/2, self.height) - root.padding - 12, 180 * (root.min_ok_value - root.min_value)/ (root.max_value - root.min_value)-90, 180 * (root.max_ok_value - root.min_value)/ (root.max_value - root.min_value)-90)
+                cap: "square"
+                #texture: root.texture
+            Color:
+                rgba: 1, 0, 0, 1
+            Line:
+                width: 2.
+                circle:
+                    (self.center_x, self.y + root.padding/2, min(self.width/2, self.height) - root.padding - 12, 180 * (root.max_ok_value - root.min_value)/ (root.max_value - root.min_value)-90, 90)
+                cap: "square"
+                #texture: root.texture
+            Color:
+                rgba: root.bar_color_p
+            Line:
+                width: 8.
+                circle:
+                    (self.center_x, self.y + root.padding/2, min(self.width/2, self.height) - root.padding, -90.1, 180 * (root.current_value - root.min_value)/ (root.max_value - root.min_value)-90)
+                cap: "square"
+                #texture: root.texture
+    Label:
+        id: current_value_label
+        text: root.label_text_p
+        halign: 'right'
+        font_size:'40sp'

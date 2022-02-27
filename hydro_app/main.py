@@ -11,6 +11,8 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import Screen, ScreenManager
 
+from hydro_app.gauge import DialGauge
+
 
 class HydroIoT(BoxLayout):
     pass
@@ -52,10 +54,10 @@ class SettingsScreen(Screen):
 
 
 class MainScreen(Screen):
-    temperature = ObjectProperty(None)
-    ph = ObjectProperty(None)
-    ec = ObjectProperty(None)
-    pressure = ObjectProperty(None)
+    temperature = ObjectProperty(22)
+    ph = ObjectProperty(6.34)
+    ec = ObjectProperty(1321)
+    pressure = ObjectProperty(6.53)
 
     connection = None
 
@@ -114,8 +116,6 @@ class MainScreen(Screen):
         host = Config.getdefault("hydroiot", "host", None)
         user = Config.getdefault("hydroiot", "user", None)
         password = Config.getdefault("hydroiot", "password", None)
-        print(user)
-        print(password)
 
         if not host or not user or not password:
             return
@@ -151,6 +151,8 @@ class MainScreen(Screen):
 class HydroApp(App):
     def build(self):
         Config.adddefaultsection("hydroiot")
+        Config.set("graphics", "multisamples", "0")
+        Config.write()
         return HydroIoT()
 
 
