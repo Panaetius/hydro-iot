@@ -194,6 +194,9 @@ class MainScreen(Screen):
 
             if callback:
                 callback(json.loads(body))
+            channel.basic_ack(delivery_tag=method.delivery_tag)
+        except:
+            channel.basic_nack(delivery_tag=method.delivery_tag)
         finally:
             if props.correlation_id in self.pending_callbacks:
                 del self.pending_callbacks[props.correlation_id]

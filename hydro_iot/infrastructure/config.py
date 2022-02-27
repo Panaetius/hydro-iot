@@ -1,3 +1,4 @@
+import json
 import os
 from dataclasses import dataclass
 from typing import List
@@ -30,4 +31,7 @@ class Config(IConfig):
         dataconf.dump(path, self, out="properties")
 
     def to_json(self) -> str:
-        return dataconf.dumps(self, out="json")
+        result = dataconf.dumps(self, out="json")
+        result = json.loads(result)
+        del result["message_queue_connection"]
+        return json.dumps(result)
