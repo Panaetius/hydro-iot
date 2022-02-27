@@ -63,6 +63,7 @@ class ControlScreen(Screen):
 
     def set_system_state(self, body):
         self.paused = body["paused"]
+        self.pause_button_text = "Unpause" if self.paused else "Pause"
 
     def set_paused(self, *args):
         self.paused = True
@@ -164,7 +165,7 @@ class MainScreen(Screen):
         global rpc_queue
         rpc_queue = frame.method.queue
         channel.queue_bind(rpc_queue, exchange="rpc_callback")
-        rpc_channel.basic_consume(rpc_queue, on_message_callback=self.handle_rpc_callback, auto_ack=True)
+        rpc_channel.basic_consume(rpc_queue, on_message_callback=self.handle_rpc_callback)
 
         # get initial readings
         print("Get initial readings")
@@ -188,10 +189,14 @@ class MainScreen(Screen):
 
     def handle_rpc_callback(self, channel, method, props, body):
         print(f"RPC callback gotten: {method}, {body}")
-        callback = self.pending_callbacks.get(props.correlation_id)
+        try:
+            callback = self.pending_callbacks.get(props.correlation_id)
 
-        if callback:
-            callback(json.loads(body))
+            if callback:
+                callback(json.loads(body))
+        finally:
+            if props.correlation_id in self.pending_callbacks:
+                del self.pending_callbacks[props.correlation_id]
 
     def on_queue_declared(self, frame):
         """Called when RabbitMQ has told us our Queue has been declared, frame is the response from RabbitMQ"""
@@ -204,6 +209,7 @@ class MainScreen(Screen):
         channel.basic_consume(frame.method.queue, self.handle_sensor_delivery)
 
     def handle_initial_values(self, body):
+        print("Got initial values")
         self.temperature = body.get("last_temperature", 20)
         self.pressure = body.get("last_pressure", 6)
         self.ph = body.get("last_ph", 6.2)

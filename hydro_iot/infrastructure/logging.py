@@ -12,6 +12,9 @@ class Logging(ILogging):
         self._log.addHandler(journal.JournaldLogHandler())
         self._log.addHandler(logging.StreamHandler(stream=sys.stdout))
         self._log.setLevel(logging.INFO)
+        stderr_handler = logging.StreamHandler(sys.stderr)
+        logging.getLogger("pika").setLevel(logging.INFO)
+        logging.getLogger("pika").addHandler(stderr_handler)
 
     def info(self, message: str):
         self._log.info(message)
