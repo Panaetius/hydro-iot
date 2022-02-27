@@ -19,7 +19,7 @@ from kivy.uix.screenmanager import Screen, ScreenManager
 from hydro_app.gauge import DialGauge
 
 stderr_handler = logging.StreamHandler(sys.stderr)
-logging.getLogger("pika").setLevel(logging.INFO)
+logging.getLogger("pika").setLevel(logging.DEBUG)
 logging.getLogger("pika").addHandler(stderr_handler)
 
 
@@ -152,13 +152,13 @@ class MainScreen(Screen):
         global queue
         print("Channel opened")
         channel = new_channel
-        channel.queue_declare(queue="", exclusive=True, callback=self.on_queue_declared)
+        channel.queue_declare(queue="", auto_delete=True, exclusive=True, callback=self.on_queue_declared)
 
     def on_rpc_channel_open(self, new_channel: pika.channel.Channel):
         global rpc_channel
         print("RPC channel opened")
         rpc_channel = new_channel
-        rpc_channel.queue_declare(queue="", exclusive=True, callback=self.on_rpc_queue_declared)
+        rpc_channel.queue_declare(queue="", auto_delete=True, exclusive=True, callback=self.on_rpc_queue_declared)
 
     def on_rpc_queue_declared(self, frame):
         print("RPC queue declared")
@@ -177,7 +177,7 @@ class MainScreen(Screen):
 
     def send_rpc_request(self, method, body: str, callback: Optional[Callable] = None):
         corr_id = uuid.uuid4().hex
-        print(f"Sending rpc request to {method}")
+        print(f"---\n---\n---\nSending rpc request to {method}")
         self.pending_callbacks[corr_id] = callback
 
         rpc_channel.basic_publish(
@@ -188,7 +188,7 @@ class MainScreen(Screen):
         )
 
     def handle_rpc_callback(self, channel, method, props, body):
-        print(f"RPC callback gotten: {method}, {body}")
+        print(f"-----\n-----\n-----\nRPC callback gotten: {body}")
         try:
             callback = self.pending_callbacks.get(props.correlation_id)
 

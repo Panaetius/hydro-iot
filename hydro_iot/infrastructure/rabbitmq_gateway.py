@@ -59,7 +59,10 @@ class RabbitMQGateway(IMessageQueuePublisher):
 
         self.sensor_data_channel.queue_declare(queue="sensor_data")
         self.event_data_channel.queue_declare(queue="event_data")
-        result = self.rpc_data_channel.queue_declare(queue="")
+        result = self.rpc_data_channel.queue_declare(
+            queue="",
+            auto_delete=True,
+        )
         self.rpc_data_channel.basic_qos(prefetch_count=1)
         self.rpc_data_channel.queue_bind(result.method.queue, exchange="rpc_data_exchange", routing_key="rpc.#")
         self.rpc_data_channel.basic_consume(queue=result.method.queue, on_message_callback=self.handle_rpc)
