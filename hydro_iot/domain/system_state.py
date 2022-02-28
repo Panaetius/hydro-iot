@@ -1,5 +1,5 @@
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass, field
 from threading import Lock
 from typing import List, Optional
 
@@ -24,7 +24,7 @@ class SystemState:
     last_ec: Optional[Conductivity] = None
     last_temperature: Optional[WaterTemperature] = None
     paused: bool = False
-    boxes_enabled: List[bool] = [True, True, True]
+    boxes_enabled: List[bool] = field(default_factory=lambda: [True, True, True])
 
     def to_json(self) -> str:
         result = {
