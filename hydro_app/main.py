@@ -112,7 +112,48 @@ class ControlScreen(Screen):
         App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request("pressure_up", "")
 
     def update_parameters_click(self):
-        App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request("", "")
+        if self.spray_interval != self.ids.spray_interval.value or self.spray_duration != self.ids.spray_duration.value:
+            self.spray_interval = self.ids.spray_interval.value
+            self.spray_duration = self.ids.spray_duration.value
+
+            App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
+                "set_spray_timing", json.dumps({"duration": self.spray_duration, "interval": self.spray_interval})
+            )
+        if self.min_ph != self.ids.ph_min.value:
+            App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
+                "set_minimum_ph", json.dumps({"ph": self.min_ph})
+            )
+        if self.max_ph != self.ids.ph_max.value:
+            App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
+                "set_maximum_ph", json.dumps({"ph": self.max_ph})
+            )
+        if self.min_ec != self.ids.ec_min.value:
+            App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
+                "set_minimum_ec", json.dumps({"ec": self.min_ec})
+            )
+        if self.max_ec != self.ids.ec_max.value:
+            App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
+                "set_maximum_ec", json.dumps({"ec": self.max_ec})
+            )
+        if self.min_pressure != self.ids.pressure_min.value:
+            App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
+                "set_minimum_pressure", json.dumps({"pressure": self.min_pressure})
+            )
+        if self.max_pressure != self.ids.pressure_max.value:
+            App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
+                "set_maximum_pressure", json.dumps({"pressure": self.max_pressure})
+            )
+
+        App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
+            "set_box_status",
+            json.dumps(
+                {
+                    "box1_status": self.ids.box1_status.active,
+                    "box2_status": self.ids.box2_status.active,
+                    "box3_status": self.ids.box3_status.active,
+                }
+            ),
+        )
 
 
 class SettingsScreen(Screen):

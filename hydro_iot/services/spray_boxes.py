@@ -1,3 +1,5 @@
+from time import sleep
+
 import inject
 
 from hydro_iot.domain.config import IConfig
@@ -27,11 +29,15 @@ def spray_boxes(
         num_boxes = len(config.pins.box_spray_pins)
 
         for i in range(num_boxes):
+            if not system_state.boxes_enabled[i]:
+                continue
+
             duration = config.timings.spray_box_timings_ms[i]
             spray_gateway.spray_box(i, duration)
             logging.info(f"Sprayed box {i} for {duration} ms")
 
             message_gateway.send_spray_message(i, duration)
+            sleep(0.1)
 
         system_state.current_pressure_level = sensor_gateway.get_pressure()
     finally:

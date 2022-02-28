@@ -1,3 +1,5 @@
+import json
+
 import inject
 
 from hydro_iot.controller.interface.scheduler import IScheduler
@@ -7,13 +9,17 @@ from hydro_iot.domain.ph import PH
 from hydro_iot.domain.pressure import Pressure
 from hydro_iot.domain.system_state import SystemState
 from hydro_iot.domain.timing import SprayTiming
+from hydro_iot.services.empty_tank import empty_tank as empty_tank_usecase
+from hydro_iot.services.ports.event_queue import IEventHub
 from hydro_iot.services.ports.message_queue import IMessageQueueSubscriber
+from hydro_iot.services.spray_boxes import spray_boxes
 
 
 class CommandEventSubscriber(IMessageQueueSubscriber):
     config = inject.attr(IConfig)
     scheduler = inject.attr(IScheduler)
     system_state = inject.attr(SystemState)
+    event_hub = inject.attr(IEventHub)
 
     def set_minimum_ph_level(self, ph: PH):
         self.config.levels.min_ph = ph.value
@@ -47,28 +53,28 @@ class CommandEventSubscriber(IMessageQueueSubscriber):
         self.config.save_config(inject.instance("config_path"))
 
     def set_box_status(self, box1_status: bool, box2_status: bool, box3_status: bool):
-        pass
+        self.system_state.boxes_enabled = [box1_status, box2_status, box3_status]
 
     def spray_boxes(self):
-        pass
+        spray_boxes()
 
     def increase_ph(self):
-        raise NotImplementedError()
+        self.event_hub.publish(key="ph.up", message="increase_ph")
 
     def decrease_ph(self):
-        raise NotImplementedError()
+        self.event_hub.publish(key="ph.down", message="decrease_ph")
 
     def increase_ec(self):
-        raise NotImplementedError()
+        self.event_hub.publish(key="ec.up", message="increase_ec")
 
     def decrease_ec(self):
-        raise NotImplementedError()
+        self.event_hub.publish(key="ec.down", message="decrease_ec")
 
     def empty_tank(self):
-        raise NotImplementedError()
+        self.event_hub.publish(key="pressure.empty", message="empty_tank")
 
     def increase_pressure(self):
-        raise NotImplementedError()
+        self.event_hub.publish(key="pressure.increase", message="increase_pressure")
 
     def pause_system(self):
         self.system_state.paused = True

@@ -275,21 +275,32 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 self.subscriber.unpause_system()
                 response = ""
             elif routing_key == "rpc.get_system_state":
-                response = self.subscriber.get_system_state()
+                self.subscriber.get_system_state()
+                response = ""
             elif routing_key == "rpc.spray_boxes":
-                response = self.subscriber.spray_boxes()
+                self.subscriber.spray_boxes()
+                response = ""
             elif routing_key == "rpc.ph_up":
-                response = self.subscriber.increase_ph()
+                self.subscriber.increase_ph()
+                response = ""
             elif routing_key == "rpc.ph_down":
-                response = self.subscriber.decrease_ph()
+                self.subscriber.decrease_ph()
+                response = ""
             elif routing_key == "rpc.ec_up":
-                response = self.subscriber.increase_ec()
+                self.subscriber.increase_ec()
+                response = ""
             elif routing_key == "rpc.ec_down":
-                response = self.subscriber.decrease_ec()
+                self.subscriber.decrease_ec()
+                response = ""
             elif routing_key == "rpc.empty_tank":
-                response = self.subscriber.empty_tank()
+                self.subscriber.empty_tank()
+                response = ""
             elif routing_key == "rpc.pressure_up":
-                response = self.subscriber.increase_pressure()
+                self.subscriber.increase_pressure()
+                response = ""
+            elif routing_key == "rpc.set_box_status":
+                self.subscriber.set_box_status(body["box1_status"], body["box2_status"], body["box3_status"])
+                response = ""
             else:
                 self.logging.error(f"Got unknown RPC request: {routing_key}, {body}")
                 channel.basic_nack(delivery_tag=method.delivery_tag)

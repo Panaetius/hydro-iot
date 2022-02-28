@@ -1,7 +1,7 @@
 import json
 from dataclasses import asdict, dataclass
 from threading import Lock
-from typing import Optional
+from typing import List, Optional
 
 from hydro_iot.domain.conductivity import Conductivity
 from hydro_iot.domain.ph import PH
@@ -24,6 +24,7 @@ class SystemState:
     last_ec: Optional[Conductivity] = None
     last_temperature: Optional[WaterTemperature] = None
     paused: bool = False
+    boxes_enabled: List[bool] = [True, True, True]
 
     def to_json(self) -> str:
         result = {

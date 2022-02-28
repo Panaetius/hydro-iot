@@ -12,6 +12,7 @@ from hydro_iot.services.adjust_nutrient_solution import (
     increase_ec_listener,
     increase_ph_listener,
 )
+from hydro_iot.services.empty_tank import empty_tank_listener
 from hydro_iot.services.increase_pressure import increase_pressure_listener
 from hydro_iot.services.ports.logging import ILogging
 from hydro_iot.services.ports.message_queue import IMessageQueueSubscriber
@@ -28,6 +29,7 @@ async def start_tasks():
         asyncio.create_task(increase_ec_listener()),
         asyncio.create_task(decrease_ec_listener()),
         asyncio.create_task(increase_pressure_listener()),
+        asyncio.create_task(empty_tank_listener()),
     ]
 
     await asyncio.gather(*tasks)
