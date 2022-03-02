@@ -275,8 +275,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 self.subscriber.unpause_system()
                 response = ""
             elif routing_key == "rpc.get_system_state":
-                self.subscriber.get_system_state()
-                response = ""
+                response = self.subscriber.get_system_state()
             elif routing_key == "rpc.spray_boxes":
                 self.subscriber.spray_boxes()
                 response = ""

@@ -32,7 +32,7 @@ def empty_tank(
         current_pressure = sensor_gateway.get_pressure()
         last_pressure = current_pressure
 
-        while current_pressure.bar <= last_pressure.bar:
+        while current_pressure.bar < last_pressure.bar:
             last_pressure = current_pressure
 
             for i in range(num_boxes):
