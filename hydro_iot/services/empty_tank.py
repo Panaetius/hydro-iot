@@ -3,6 +3,7 @@ from time import sleep
 import inject
 
 from hydro_iot.domain.config import IConfig
+from hydro_iot.domain.pressure import Pressure
 from hydro_iot.domain.system_state import SystemState
 from hydro_iot.services.ports.event_queue import IEventHub
 from hydro_iot.services.ports.logging import ILogging
@@ -30,7 +31,7 @@ def empty_tank(
         duration = 2000
 
         last_pressure = sensor_gateway.get_pressure()
-        current_pressure = last_pressure - 0.1
+        current_pressure = Pressure(bar=last_pressure.bar - 0.1)
 
         while current_pressure.bar < last_pressure.bar:
             last_pressure = current_pressure
