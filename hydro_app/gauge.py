@@ -22,6 +22,8 @@ class DialGauge(EffectWidget):
     padding = NumericProperty(50)
     texture = ObjectProperty(None)
 
+    font_size = StringProperty("30dp")
+
     def __init__(self, **kwargs):
         super(DialGauge, self).__init__(**kwargs)
         self.texture = Texture.create(size=(1, 64), colorfmt="rgb", bufferfmt="ubyte", mipmap=True)

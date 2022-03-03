@@ -19,7 +19,7 @@
             Line:
                 width: 2.
                 circle:
-                    (self.center_x, self.y + root.padding/2, min(self.width/2, self.height) - root.padding - 12, -90.1, 180 * (root.min_ok_value - root.min_value)/ (root.max_value - root.min_value)-90, 2000)
+                    (self.center_x, self.y + max((self.height - min(self.width/2, self.height)) / 2, 0) + root.padding/2, min(self.width/2, self.height) - root.padding - 12, -90.1, 180 * (root.min_ok_value - root.min_value)/ (root.max_value - root.min_value)-90, 2000)
                 cap: "square"
                 #texture: root.texture
             Color:
@@ -27,7 +27,7 @@
             Line:
                 width: 2.
                 circle:
-                    (self.center_x, self.y + root.padding/2, min(self.width/2, self.height) - root.padding - 12, 180 * (root.min_ok_value - root.min_value)/ (root.max_value - root.min_value)-90, 180 * (root.max_ok_value - root.min_value)/ (root.max_value - root.min_value)-90)
+                    (self.center_x, self.y +max((self.height - min(self.width/2, self.height)) / 2, 0) + root.padding/2, min(self.width/2, self.height) - root.padding - 12, 180 * (root.min_ok_value - root.min_value)/ (root.max_value - root.min_value)-90, 180 * (root.max_ok_value - root.min_value)/ (root.max_value - root.min_value)-90)
                 cap: "square"
                 #texture: root.texture
             Color:
@@ -35,7 +35,7 @@
             Line:
                 width: 2.
                 circle:
-                    (self.center_x, self.y + root.padding/2, min(self.width/2, self.height) - root.padding - 12, 180 * (root.max_ok_value - root.min_value)/ (root.max_value - root.min_value)-90, 90)
+                    (self.center_x, self.y + max((self.height - min(self.width/2, self.height)) / 2, 0) + root.padding/2, min(self.width/2, self.height) - root.padding - 12, 180 * (root.max_ok_value - root.min_value)/ (root.max_value - root.min_value)-90, 90)
                 cap: "square"
                 #texture: root.texture
             Color:
@@ -43,13 +43,14 @@
             Line:
                 width: 8.
                 circle:
-                    (self.center_x, self.y + root.padding/2, min(self.width/2, self.height) - root.padding, -90.1, 180 * (root.current_value - root.min_value)/ (root.max_value - root.min_value)-90)
+                    (self.center_x, self.y + max((self.height - min(self.width/2, self.height)) / 2, 0) + root.padding/2, min(self.width/2, self.height) - root.padding, -90.1, 180 * (root.current_value - root.min_value)/ (root.max_value - root.min_value)-90)
                 cap: "square"
                 #texture: root.texture
     Label:
         id: current_value_label
         text: root.label_text_p
         halign: 'center'
-        valign: 'bottom'
+        valign: 'middle'
         text_size: root.width, root.height
-        font_size:'30sp'
+        font_size:root.font_size
+        pos_hint: {'x': 0, 'y': -0.1}

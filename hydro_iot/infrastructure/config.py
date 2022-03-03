@@ -28,7 +28,7 @@ class Config(IConfig):
         return conf.on(Config)
 
     def save_config(self, path: str):
-        dataconf.dump(path, self, out="properties")
+        dataconf.dump(path, self, out="hocon")
 
     def to_json(self) -> str:
         result = dataconf.dumps(self, out="json")
