@@ -29,8 +29,8 @@ def empty_tank(
         num_boxes = len(config.pins.box_spray_pins)
         duration = 2000
 
-        current_pressure = sensor_gateway.get_pressure()
-        last_pressure = current_pressure
+        last_pressure = sensor_gateway.get_pressure()
+        current_pressure = last_pressure - 0.1
 
         while current_pressure.bar < last_pressure.bar:
             last_pressure = current_pressure
