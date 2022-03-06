@@ -9,10 +9,15 @@ from hydro_iot.services.ports.camera_gateway import ICameraGateway
 
 
 class PiCameraGateway(ICameraGateway):
+    custom_gains = (2.26, 0.74)
+
     def take_ndvi_picture(self) -> numpy.ndarray:
         camera = picamera.PiCamera()
         try:
+            camera.awb_mode = "off"
+            camera.awb_gains = self.customGains
             camera.led = False
+            camera.resolution = (1920, 1080)
             sleep(1)
             stream = BytesIO()
             camera.capture(stream, format="png")
