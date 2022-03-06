@@ -14,12 +14,14 @@ from hydro_iot.infrastructure.config import Config
 from hydro_iot.infrastructure.dummy_message_queue import DummyMQGateway
 from hydro_iot.infrastructure.event_queue import AsyncioEventHub
 from hydro_iot.infrastructure.logging import Logging
+from hydro_iot.infrastructure.picamera_gateway import PiCameraGateway
 from hydro_iot.infrastructure.pump_gateway import PumpGateway
 from hydro_iot.infrastructure.rabbitmq_gateway import RabbitMQGateway
 from hydro_iot.infrastructure.scheduler import APScheduler
 from hydro_iot.infrastructure.sensor_gateway import RaspberrySensorGateway
 from hydro_iot.infrastructure.spray_gateway import SprayGateway
 from hydro_iot.services.command_event_subscriber import CommandEventSubscriber
+from hydro_iot.services.ports.camera_gateway import ICameraGateway
 from hydro_iot.services.ports.event_queue import IEventHub
 from hydro_iot.services.ports.logging import ILogging
 from hydro_iot.services.ports.message_queue import (
@@ -43,6 +45,7 @@ def config(binder):
     binder.bind_to_constructor(IEventHub, lambda: AsyncioEventHub())
     binder.bind_to_constructor(ISprayGateway, lambda: SprayGateway())
     binder.bind_to_constructor(IPumpGateway, lambda: PumpGateway())
+    binder.bind_to_constructor(ICameraGateway, lambda: PiCameraGateway())
     binder.bind_to_constructor(ILogging, lambda: Logging())
 
     config_path = "/etc/hydro_iot/config.hocon"

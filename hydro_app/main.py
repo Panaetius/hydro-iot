@@ -227,18 +227,23 @@ class MainScreen(Screen):
         print("Get initial readings")
 
         def _startup():
-            sleep(5)
-            self.send_rpc_request(
-                "get_system_state",
-                "",
-                lambda ch, method, properties, body: self.handle_initial_values(ch, method, properties, body),
-            )
-            sleep(1)
-            self.send_rpc_request(
-                "get_config", "", App.get_running_app().root.ids.sm.get_screen("control").set_config_values
-            )
+            sleep(2)
+            self.get_system_state()
+            self.get_config()
 
         Thread(target=_startup).start()
+
+    def get_system_state(self):
+        self.send_rpc_request(
+            "get_system_state",
+            "",
+            lambda ch, method, properties, body: self.handle_initial_values(ch, method, properties, body),
+        )
+
+    def get_config(self):
+        self.send_rpc_request(
+            "get_config", "", App.get_running_app().root.ids.sm.get_screen("control").set_config_values
+        )
 
     def send_rpc_request(self, method, body: str, callback: Optional[Callable] = None):
         corr_id = uuid.uuid4().hex
@@ -353,6 +358,15 @@ class HydroApp(App):
         Config.set("graphics", "multisamples", "0")
         Config.write()
         return HydroIoT()
+
+    def on_stop(self):
+        App.get_running_app().root.ids.sm.get_screen("values").stop_mq_listener()
+
+    def on_pause(self):
+        App.get_running_app().root.ids.sm.get_screen("values").stop_mq_listener()
+
+    def on_resume(self):
+        App.get_running_app().root.ids.sm.get_screen("values").start_mq_listener()
 
 
 def main():

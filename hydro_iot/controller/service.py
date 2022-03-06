@@ -13,6 +13,7 @@ from hydro_iot.services.adjust_nutrient_solution import (
     increase_ph_listener,
 )
 from hydro_iot.services.empty_tank import empty_tank_listener
+from hydro_iot.services.get_ndvi import calculate_ndvi
 from hydro_iot.services.increase_pressure import increase_pressure_listener
 from hydro_iot.services.ports.logging import ILogging
 from hydro_iot.services.ports.message_queue import IMessageQueueSubscriber
@@ -68,6 +69,8 @@ def start_service(
         seconds=config.timings.check_pressure_interval_ms / 1000.0,
         id="read_pressure",
     )
+
+    scheduler.repeat_job_at_interval(func=calculate_ndvi, seconds=5, id="calculate_ndvi")
 
     scheduler.start()
 
