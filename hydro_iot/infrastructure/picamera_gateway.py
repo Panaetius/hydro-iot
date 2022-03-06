@@ -15,7 +15,7 @@ class PiCameraGateway(ICameraGateway):
         camera = picamera.PiCamera()
         try:
             camera.awb_mode = "off"
-            camera.awb_gains = self.customGains
+            camera.awb_gains = self.custom_gains
             camera.led = False
             camera.resolution = (1920, 1080)
             sleep(1)
