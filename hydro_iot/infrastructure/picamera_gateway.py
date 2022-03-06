@@ -1,4 +1,5 @@
 from io import BytesIO
+from time import sleep
 
 import numpy
 import picamera
@@ -12,6 +13,7 @@ class PiCameraGateway(ICameraGateway):
         camera = picamera.PiCamera()
         try:
             camera.led = False
+            sleep(1)
             stream = BytesIO()
             camera.capture(stream, format="png")
             stream.seek(0)
@@ -21,6 +23,7 @@ class PiCameraGateway(ICameraGateway):
             normal_red = numpy.asarray(normal_red).astype(float)
 
             camera.led = True
+            sleep(1)
             stream = BytesIO()
             camera.capture(stream, format="png")
             stream.seek(0)
