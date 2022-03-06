@@ -19,17 +19,17 @@ class PiCameraGateway(ICameraGateway):
             stream.seek(0)
             normal_image = Image.open(stream)
 
-            normal_red, _, _, _ = normal_image.split()
+            near_infrared, _, normal_red, _ = normal_image.split()
             normal_red = numpy.asarray(normal_red).astype(float)
 
-            camera.led = True
-            sleep(1)
-            stream = BytesIO()
-            camera.capture(stream, format="png")
-            stream.seek(0)
-            infrared_image = Image.open(stream)
+            # camera.led = True
+            # sleep(1)
+            # stream = BytesIO()
+            # camera.capture(stream, format="png")
+            # stream.seek(0)
+            # infrared_image = Image.open(stream)
 
-            near_infrared, _, _, _ = infrared_image.split()
+            # near_infrared, _, _, _ = infrared_image.split()
             near_infrared = numpy.asarray(near_infrared).astype(float)
 
             nominator = near_infrared - normal_red
@@ -39,6 +39,7 @@ class PiCameraGateway(ICameraGateway):
 
             # ignore non-plant values of ndvi
             ndvi[ndvi < 0.2] = 0
+            ndvi[ndvi > 1.0] = 1.0
 
             return ndvi
 
