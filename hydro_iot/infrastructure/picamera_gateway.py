@@ -41,3 +41,4 @@ class PiCameraGateway(ICameraGateway):
 
         finally:
             camera.led = False
+            camera.close()

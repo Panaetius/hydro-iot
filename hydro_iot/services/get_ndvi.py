@@ -1,5 +1,6 @@
 import inject
 from PIL import Image
+import numpy
 
 from hydro_iot.services.ports.camera_gateway import ICameraGateway
 from hydro_iot.services.ports.logging import ILogging
@@ -12,10 +13,11 @@ def calculate_ndvi(
     logging: ILogging,
     message_gateway: IMessageQueuePublisher,
 ):
+    logging.info("Capturing image")
     ndvi = camera_gateway.take_ndvi_picture()
     logging.info("Captured ndvi image")
 
-    image = Image.fromarray(ndvi)
+    image = Image.fromarray(numpy.uint8(ndvi * 255), "L")
     image.save("/home/pi/ndvi.png")
 
     # message_gateway.send_temperature_status(temperature)
