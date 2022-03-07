@@ -297,6 +297,9 @@ class RabbitMQGateway(IMessageQueuePublisher):
             elif routing_key == "rpc.pressure_up":
                 self.subscriber.increase_pressure()
                 response = ""
+            elif routing_key == "rpc.take_ndvi_image":
+                self.subscriber.take_ndvi_image()
+                response = ""
             elif routing_key == "rpc.set_box_status":
                 self.subscriber.set_box_status(body["box1_status"], body["box2_status"], body["box3_status"])
                 response = ""

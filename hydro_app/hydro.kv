@@ -164,6 +164,13 @@
                     on_release: root.pressure_up_click()
             BoxLayout:
                 orientation: "horizontal"
+                Button:
+                    id: take_picture_button
+                    text:"Take Picture"
+                    font_size:'30dp'
+                    on_release: root.take_picture_click()
+            BoxLayout:
+                orientation: "horizontal"
                 Label:
                     text: "Boxes"
                     font_size:'30dp'

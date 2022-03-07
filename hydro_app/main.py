@@ -110,6 +110,9 @@ class ControlScreen(Screen):
     def pressure_up_click(self):
         App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request("pressure_up", "")
 
+    def pressure_up_click(self):
+        App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request("take_ndvi_image", "")
+
     def update_parameters_click(self):
         if self.spray_interval != self.ids.spray_interval.value or self.spray_duration != self.ids.spray_duration.value:
             self.spray_interval = self.ids.spray_interval.value

@@ -10,6 +10,7 @@ from hydro_iot.domain.pressure import Pressure
 from hydro_iot.domain.system_state import SystemState
 from hydro_iot.domain.timing import SprayTiming
 from hydro_iot.services.empty_tank import empty_tank as empty_tank_usecase
+from hydro_iot.services.get_ndvi import calculate_ndvi
 from hydro_iot.services.ports.event_queue import IEventHub
 from hydro_iot.services.ports.message_queue import IMessageQueueSubscriber
 from hydro_iot.services.spray_boxes import spray_boxes
@@ -87,3 +88,6 @@ class CommandEventSubscriber(IMessageQueueSubscriber):
 
     def get_config(self):
         return self.config.to_json()
+
+    def take_ndvi_image(self):
+        calculate_ndvi()
