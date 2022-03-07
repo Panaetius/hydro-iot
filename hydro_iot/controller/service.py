@@ -70,7 +70,9 @@ def start_service(
         id="read_pressure",
     )
 
-    #scheduler.repeat_job_at_interval(func=calculate_ndvi, seconds=15, id="calculate_ndvi")
+    scheduler.repeat_job_at_interval(
+        func=calculate_ndvi, seconds=config.timings.take_ndvi_image_interval_s, id="calculate_ndvi"
+    )
 
     scheduler.start()
 

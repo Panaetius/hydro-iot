@@ -11,6 +11,7 @@ class Timings:
     spray_box_timings_ms: List[int]
     ph_ec_adjustment_downtime_ms: int
     minimum_pressure_error_wait_time_ms: int
+    take_ndvi_image_interval_s: int
 
 
 @dataclass
@@ -52,6 +53,7 @@ class Pins:
     ph_up_pump: int
     ph_down_pump: int
     box_spray_pins: List[int]
+    camera_ir_filter_pin: int
     fresh_water_pump: Optional[int] = None
 
 

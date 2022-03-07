@@ -10,6 +10,7 @@ timings {
     ]
     ph_ec_adjustment_downtime_ms = 1200000
     minimum_pressure_error_wait_time_ms = 60000
+    take_ndvi_image_interval_s = 900
 }
 
 levels {
@@ -52,5 +53,6 @@ pins {
         23,
         20,
         21
-    ]
+    ],
+    camera_ir_filter_pin = 2
 }
