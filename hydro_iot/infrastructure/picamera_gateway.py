@@ -71,7 +71,10 @@ class PiCameraGateway(ICameraGateway):
             ndvi = self._stretch_contrast(ndvi, in_min=-1, in_max=1)
             cv2.imwrite("/home/pi/images/ndvi.png", ndvi)
             cm = ndvi.astype(numpy.uint8)
-            cm[cm < 150] = 0
+
+            # add minimum/maximum pixel to force full color range
+            cm[0, 0] = 0
+            cm[0, 1] = 255
             colormapped = cv2.applyColorMap(cm, cmapy.cmap("viridis"))
             cv2.imwrite("/home/pi/images/colormapped.png", colormapped)
 
