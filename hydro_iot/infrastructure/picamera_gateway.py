@@ -284,9 +284,12 @@ class PiCameraGateway(ICameraGateway):
 
         GPIO.setup(self.config.pins.camera_ir_filter_pin, GPIO.OUT)
 
-    def _stretch_contrast(self, image):
-        in_min = numpy.percentile(image, 5)
-        in_max = numpy.percentile(image, 95)
+    def _stretch_contrast(self, image, in_min=None, in_max=None):
+        if not in_min:
+            in_min = numpy.percentile(image, 5)
+        if not in_max:
+            in_max = numpy.percentile(image, 95)
+
         out_min = 0.0
         out_max = 255.0
         out = image - in_min
@@ -328,7 +331,7 @@ class PiCameraGateway(ICameraGateway):
             GPIO.output(self.config.pins.camera_ir_filter_pin, GPIO.LOW)
 
             ndvi = self._calculate_ndvi(original_stream.array, ir_stream.array)
-            ndvi = self._stretch_contrast(ndvi)
+            ndvi = self._stretch_contrast(ndvi, in_min=-1, in_max=1)
             cv2.imwrite("/home/pi/images/ndvi.png", ndvi)
             cm = ndvi.astype(numpy.uint8)
             colormapped = cv2.applyColorMap(cm, self.fastiecm)
