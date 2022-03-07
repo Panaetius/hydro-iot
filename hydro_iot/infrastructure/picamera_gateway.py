@@ -308,7 +308,7 @@ class PiCameraGateway(ICameraGateway):
     def take_ndvi_picture(self) -> numpy.ndarray:
         camera = picamera.PiCamera()
         try:
-            camera.resolution = (1920, 1080)
+            camera.resolution = (2592, 1944)
             GPIO.output(self.config.pins.camera_ir_filter_pin, GPIO.HIGH)
             sleep(2)
 
