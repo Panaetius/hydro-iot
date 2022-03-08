@@ -47,15 +47,17 @@ class PiCameraGateway(ICameraGateway):
 
     def take_ndvi_picture(self) -> numpy.ndarray:
         camera = picamera.PiCamera()
+        camera.awb_mode = "off"
+        camera.awb_gains = self.custom_gains
+        camera.resolution = (2592, 1944)
         try:
-            camera.resolution = (2592, 1944)
             GPIO.output(self.config.pins.camera_ir_filter_pin, GPIO.HIGH)
             sleep(2)
 
             # Get non-IR image
             original_stream = picamera.array.PiRGBArray(camera)
-            camera.capture(original_stream, format="bgr", use_video_port=True)
-            cv2.imwrite("/home/pi/images/original.png", original_stream.array)
+            camera.capture(original_stream, format="bgr", use_video_port=False)
+            cv2.imwrite("/home/pi/images/original.png", original_stream.array, [cv2.IMWRITE_PNG_COMPRESSION, 8])
             # contrasted = self._stretch_contrast(original_stream.array)
             # cv2.imwrite("/home/pi/images/contrasted.png", contrasted)
 
@@ -63,20 +65,20 @@ class PiCameraGateway(ICameraGateway):
             GPIO.output(self.config.pins.camera_ir_filter_pin, GPIO.LOW)
             sleep(2)
             ir_stream = picamera.array.PiRGBArray(camera)
-            camera.capture(ir_stream, format="bgr", use_video_port=True)
-            cv2.imwrite("/home/pi/images/ir.png", ir_stream.array)
+            camera.capture(ir_stream, format="bgr", use_video_port=False)
+            cv2.imwrite("/home/pi/images/ir.png", ir_stream.array, [cv2.IMWRITE_PNG_COMPRESSION, 8])
             GPIO.output(self.config.pins.camera_ir_filter_pin, GPIO.LOW)
 
             ndvi = self._calculate_ndvi(original_stream.array, ir_stream.array)
             ndvi = self._stretch_contrast(ndvi, in_min=-1, in_max=1)
-            cv2.imwrite("/home/pi/images/ndvi.png", ndvi)
+            cv2.imwrite("/home/pi/images/ndvi.png", ndvi, [cv2.IMWRITE_PNG_COMPRESSION, 8])
             cm = ndvi.astype(numpy.uint8)
 
             # add minimum/maximum pixel to force full color range
             cm[0, 0] = 0
             cm[0, 1] = 255
             colormapped = cv2.applyColorMap(cm, cmapy.cmap("viridis"))
-            cv2.imwrite("/home/pi/images/colormapped.png", colormapped)
+            cv2.imwrite("/home/pi/images/colormapped.png", colormapped, [cv2.IMWRITE_PNG_COMPRESSION, 8])
 
             return ndvi
 
