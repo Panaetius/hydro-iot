@@ -22,9 +22,8 @@ class SprayGateway(ISprayGateway):
             GPIO.setup(box_pin, GPIO.OUT)
 
     def spray_box(self, index: int, duration: int):
-        with self.system_state.power_output_lock:
-            try:
-                GPIO.output(self.config.pins.box_spray_pins[index], GPIO.HIGH)
-                sleep(duration / 1000.0)
-            finally:
-                GPIO.output(self.config.pins.box_spray_pins[index], GPIO.LOW)
+        try:
+            GPIO.output(self.config.pins.box_spray_pins[index], GPIO.HIGH)
+            sleep(duration / 1000.0)
+        finally:
+            GPIO.output(self.config.pins.box_spray_pins[index], GPIO.LOW)
