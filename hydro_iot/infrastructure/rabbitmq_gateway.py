@@ -32,16 +32,6 @@ class RabbitMQGateway(IMessageQueuePublisher):
         self.sensor_data_channel = None
         self.event_data_channel = None
 
-        self.consume_connection = pika.BlockingConnection(
-            pika.ConnectionParameters(
-                host=self.config.message_queue_connection.host,
-                port=self.config.message_queue_connection.port,
-                credentials=pika.PlainCredentials(
-                    self.config.message_queue_connection.user, self.config.message_queue_connection.password
-                ),
-            )
-        )
-
         self.publish_connection = pika.BlockingConnection(
             pika.ConnectionParameters(
                 host=self.config.message_queue_connection.host,
@@ -55,19 +45,43 @@ class RabbitMQGateway(IMessageQueuePublisher):
         self.logging.info("Starting messagequeue io loop")
         self.sensor_data_channel = self.publish_connection.channel()
         self.event_data_channel = self.publish_connection.channel()
-        self.rpc_data_channel = self.consume_connection.channel()
 
         self.sensor_data_channel.queue_declare(queue="sensor_data")
         self.event_data_channel.queue_declare(queue="event_data")
-        result = self.rpc_data_channel.queue_declare(
-            queue="",
-            auto_delete=True,
-        )
-        self.rpc_data_channel.basic_qos(prefetch_count=1)
-        self.rpc_data_channel.queue_bind(result.method.queue, exchange="rpc_data_exchange", routing_key="rpc.#")
-        self.rpc_data_channel.basic_consume(queue=result.method.queue, on_message_callback=self.handle_rpc)
         self.logging.info("Start consuming rpc channel")
-        Thread(target=self.rpc_data_channel.start_consuming).start()
+        Thread(target=self.__consume_data_channel).start()
+
+    def __consume_data_channel(self):
+        while True:
+            try:
+                self.consume_connection = pika.BlockingConnection(
+                    pika.ConnectionParameters(
+                        host=self.config.message_queue_connection.host,
+                        port=self.config.message_queue_connection.port,
+                        credentials=pika.PlainCredentials(
+                            self.config.message_queue_connection.user, self.config.message_queue_connection.password
+                        ),
+                    )
+                )
+                self.rpc_data_channel = self.consume_connection.channel()
+                result = self.rpc_data_channel.queue_declare(
+                    queue="",
+                    auto_delete=True,
+                )
+                self.rpc_data_channel.basic_qos(prefetch_count=1)
+                self.rpc_data_channel.queue_bind(result.method.queue, exchange="rpc_data_exchange", routing_key="rpc.#")
+                self.rpc_data_channel.basic_consume(queue=result.method.queue, on_message_callback=self.handle_rpc)
+                self.rpc_data_channel.start_consuming()
+            except pika.exceptions.ConnectionClosedByBroker:
+                continue
+            # Do not recover on channel errors
+            except pika.exceptions.AMQPChannelError as err:
+                self.logging.error(f"Caught a channel error: {err}, stopping...")
+                break
+            # Recover on all other connection errors
+            except pika.exceptions.AMQPConnectionError:
+                self.logging.error("Connection was closed, retrying...")
+                continue
 
     def __del__(self):
         self.consume_connection.close()

@@ -119,7 +119,8 @@ class ControlScreen(Screen):
             self.spray_duration = self.ids.spray_duration.value
 
             App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
-                "set_spray_timing", json.dumps({"duration": self.spray_duration, "interval": self.spray_interval})
+                "set_spray_timing",
+                json.dumps({"duration": self.spray_duration, "interval": self.spray_interval * (60 * 1000)}),
             )
         if self.min_ph != self.ids.ph_min.value:
             App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
