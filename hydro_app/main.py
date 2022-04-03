@@ -49,6 +49,9 @@ class ControlScreen(Screen):
     picture_interval = ObjectProperty(15)
     paused = ObjectProperty(False)
     pause_button_text = StringProperty("Pause")
+    box1_enabled = ObjectProperty(True)
+    box2_enabled = ObjectProperty(True)
+    box3_enabled = ObjectProperty(True)
 
     def set_config_values(self, channel, method, props, body):
         self.spray_duration = body["timings"]["spray_box_timings_ms"][0]
@@ -59,6 +62,11 @@ class ControlScreen(Screen):
         self.max_ec = body["levels"]["max_ec"]
         self.min_pressure = body["levels"]["minimum_pressure_bar"]
         self.max_pressure = body["levels"]["maximum_pressure_bar"]
+
+        boxes_enabled = body["levels"]["boxes_enabled"]
+        self.box1_enabled = boxes_enabled[0]
+        self.box2_enabled = boxes_enabled[1]
+        self.box3_enabled = boxes_enabled[2]
 
         App.get_running_app().root.ids.sm.get_screen("values").min_ph = self.min_ph
         App.get_running_app().root.ids.sm.get_screen("values").max_ph = self.max_ph
@@ -123,40 +131,54 @@ class ControlScreen(Screen):
                 json.dumps({"duration": self.spray_duration, "interval": self.spray_interval * (60 * 1000)}),
             )
         if self.min_ph != self.ids.ph_min.value:
+            self.min_ph = self.ids.ph_min.value
             App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
                 "set_minimum_ph", json.dumps({"ph": self.min_ph})
             )
         if self.max_ph != self.ids.ph_max.value:
+            self.max_ph = self.ids.ph_max.value
             App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
                 "set_maximum_ph", json.dumps({"ph": self.max_ph})
             )
         if self.min_ec != self.ids.ec_min.value:
+            self.min_ec = self.ids.ec_min.value
             App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
                 "set_minimum_ec", json.dumps({"ec": self.min_ec})
             )
         if self.max_ec != self.ids.ec_max.value:
+            self.max_ec = self.ids.ec_max.value
             App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
                 "set_maximum_ec", json.dumps({"ec": self.max_ec})
             )
         if self.min_pressure != self.ids.pressure_min.value:
+            self.min_pressure = self.ids.pressure_min.value
             App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
                 "set_minimum_pressure", json.dumps({"pressure": self.min_pressure})
             )
         if self.max_pressure != self.ids.pressure_max.value:
+            self.max_pressure = self.ids.pressure_max.value
             App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
                 "set_maximum_pressure", json.dumps({"pressure": self.max_pressure})
             )
 
-        App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
-            "set_box_status",
-            json.dumps(
-                {
-                    "box1_status": self.ids.box1_status.active,
-                    "box2_status": self.ids.box2_status.active,
-                    "box3_status": self.ids.box3_status.active,
-                }
-            ),
-        )
+        if (
+            self.box1_enabled != self.ids.box1_status.active
+            or self.box2_enabled != self.ids.box2_status.active
+            or self.box3_enabled != self.ids.box3_status.active
+        ):
+            self.box1_enabled = self.ids.box1_status.active
+            self.box2_enabled = self.ids.box2_status.active
+            self.box3_enabled = self.ids.box3_status.active
+            App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
+                "set_box_status",
+                json.dumps(
+                    {
+                        "box1_status": self.box1_enabled,
+                        "box2_status": self.box2_enabled,
+                        "box3_status": self.box3_enabled,
+                    }
+                ),
+            )
 
 
 class SettingsScreen(Screen):

@@ -1,3 +1,4 @@
+from fractions import Fraction
 from time import sleep
 
 import cmapy
@@ -7,7 +8,6 @@ import numpy
 import picamera
 import picamera.array
 import RPi.GPIO as GPIO
-from fractions import Fraction
 
 from hydro_iot.domain.config import IConfig
 from hydro_iot.domain.system_state import SystemState
@@ -19,7 +19,7 @@ class PiCameraGateway(ICameraGateway):
     custom_gains = (1.3, 1.0)
     config: IConfig = inject.attr(IConfig)
     logging: ILogging = inject.attr(ILogging)
-    system_state : SystemState = inject.attr(SystemState)
+    system_state: SystemState = inject.attr(SystemState)
 
     def __init__(self):
         GPIO.setmode(GPIO.BCM)
@@ -53,14 +53,14 @@ class PiCameraGateway(ICameraGateway):
     def take_ndvi_picture(self) -> numpy.ndarray:
         camera = picamera.PiCamera()
         camera.resolution = (2560, 1920)
-        #camera.iso = 100
+        # camera.iso = 100
         try:
             with self.system_state.power_output_lock:
                 GPIO.output(self.config.pins.camera_ir_filter_pin, GPIO.HIGH)
                 sleep(3)
-                #gains = camera.awb_gains
-                #camera.shutter_speed = camera.exposure_speed
-                #camera.exposure_mode = "off"
+                # gains = camera.awb_gains
+                # camera.shutter_speed = camera.exposure_speed
+                # camera.exposure_mode = "off"
                 camera.awb_mode = "off"
                 camera.awb_gains = self.custom_gains
                 # Get non-IR image
