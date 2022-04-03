@@ -29,7 +29,7 @@ def spray_boxes(
         num_boxes = len(config.pins.box_spray_pins)
 
         for i in range(num_boxes):
-            if not system_state.boxes_enabled[i]:
+            if not config.levels.boxes_enabled[i]:
                 continue
 
             duration = config.timings.spray_box_timings_ms[i]

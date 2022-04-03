@@ -23,6 +23,7 @@ class Levels:
     minimum_pressure_bar: float
     maximum_pressure_bar: float
     pressure_drop_error_threshold: float
+    boxes_enabled: List[bool]
 
 
 @dataclass

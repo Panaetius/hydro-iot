@@ -47,14 +47,15 @@ class CommandEventSubscriber(IMessageQueueSubscriber):
         self.config.save_config(inject.instance("config_path"))
 
     def set_spray_timing(self, timing: SprayTiming):
-        self.config.timings.spray_box_interval_ms = timing.interval_ms
+        self.config.timings.spray_box_interval_ms = int(timing.interval_ms)
         self.scheduler.change_job_schedule("spray_boxes", timing.interval_ms / 1000.0)
 
-        self.config.timings.spray_box_timings_ms = [timing.duration_ms] * 3  # TODO: Change to timing per Box
+        self.config.timings.spray_box_timings_ms = [int(timing.duration_ms)] * 3  # TODO: Change to timing per Box
         self.config.save_config(inject.instance("config_path"))
 
     def set_box_status(self, box1_status: bool, box2_status: bool, box3_status: bool):
-        self.system_state.boxes_enabled = [box1_status, box2_status, box3_status]
+        self.config.levels.boxes_enabled = [box1_status, box2_status, box3_status]
+        self.config.save_config(inject.instance("config_path"))
 
     def spray_boxes(self):
         spray_boxes()

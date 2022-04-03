@@ -24,7 +24,6 @@ class SystemState:
     last_ec: Optional[Conductivity] = None
     last_temperature: Optional[WaterTemperature] = None
     paused: bool = False
-    boxes_enabled: List[bool] = field(default_factory=lambda: [True, True, True])
 
     def to_json(self) -> str:
         result = {

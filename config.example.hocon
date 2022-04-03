@@ -21,6 +21,11 @@ levels {
     minimum_pressure_bar = 6.0
     maximum_pressure_bar = 8.5
     pressure_drop_error_threshold = 0.25
+    boxes_enabled = [
+        true,
+        true,
+        true
+    ],
 }
 
 amounts {
