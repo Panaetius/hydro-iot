@@ -23,7 +23,7 @@ def read_ph_conductivity(
     system_state.last_ph = ph
     logging.info(f"PH: {ph.value}")
 
-    sleep(0.5)
+    sleep(3)
 
     ec = sensor_gateway.get_conductivity()
     system_state.last_ec = ec

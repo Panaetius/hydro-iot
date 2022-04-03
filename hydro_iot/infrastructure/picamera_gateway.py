@@ -7,14 +7,19 @@ import numpy
 import picamera
 import picamera.array
 import RPi.GPIO as GPIO
+from fractions import Fraction
 
 from hydro_iot.domain.config import IConfig
+from hydro_iot.domain.system_state import SystemState
 from hydro_iot.services.ports.camera_gateway import ICameraGateway
+from hydro_iot.services.ports.logging import ILogging
 
 
 class PiCameraGateway(ICameraGateway):
-    custom_gains = (2.26, 0.74)
+    custom_gains = (1.3, 1.0)
     config: IConfig = inject.attr(IConfig)
+    logging: ILogging = inject.attr(ILogging)
+    system_state : SystemState = inject.attr(SystemState)
 
     def __init__(self):
         GPIO.setmode(GPIO.BCM)
@@ -47,38 +52,42 @@ class PiCameraGateway(ICameraGateway):
 
     def take_ndvi_picture(self) -> numpy.ndarray:
         camera = picamera.PiCamera()
-        camera.awb_mode = "off"
-        camera.awb_gains = self.custom_gains
-        camera.resolution = (2592, 1944)
+        camera.resolution = (2560, 1920)
+        #camera.iso = 100
         try:
-            GPIO.output(self.config.pins.camera_ir_filter_pin, GPIO.HIGH)
-            sleep(2)
+            with self.system_state.power_output_lock:
+                GPIO.output(self.config.pins.camera_ir_filter_pin, GPIO.HIGH)
+                sleep(3)
+                #gains = camera.awb_gains
+                #camera.shutter_speed = camera.exposure_speed
+                #camera.exposure_mode = "off"
+                camera.awb_mode = "off"
+                camera.awb_gains = self.custom_gains
+                # Get non-IR image
+                original_stream = picamera.array.PiRGBArray(camera)
+                camera.capture(original_stream, format="bgr", use_video_port=True)
+                # contrasted = self._stretch_contrast(original_stream.array)
+                # cv2.imwrite("/home/pi/images/contrasted.png", contrasted)
 
-            # Get non-IR image
-            original_stream = picamera.array.PiRGBArray(camera)
-            camera.capture(original_stream, format="bgr", use_video_port=False)
-            cv2.imwrite("/home/pi/images/original.png", original_stream.array, [cv2.IMWRITE_PNG_COMPRESSION, 8])
-            # contrasted = self._stretch_contrast(original_stream.array)
-            # cv2.imwrite("/home/pi/images/contrasted.png", contrasted)
-
-            # Get IR image
-            GPIO.output(self.config.pins.camera_ir_filter_pin, GPIO.LOW)
-            sleep(2)
+                # Get IR image
+                GPIO.output(self.config.pins.camera_ir_filter_pin, GPIO.LOW)
+            sleep(3)
             ir_stream = picamera.array.PiRGBArray(camera)
-            camera.capture(ir_stream, format="bgr", use_video_port=False)
-            cv2.imwrite("/home/pi/images/ir.png", ir_stream.array, [cv2.IMWRITE_PNG_COMPRESSION, 8])
+            camera.capture(ir_stream, format="bgr", use_video_port=True)
             GPIO.output(self.config.pins.camera_ir_filter_pin, GPIO.LOW)
 
+            cv2.imwrite("/home/pi/images/ir.png", ir_stream.array, [cv2.IMWRITE_PNG_COMPRESSION, 6])
+            cv2.imwrite("/home/pi/images/original.png", original_stream.array, [cv2.IMWRITE_PNG_COMPRESSION, 6])
             ndvi = self._calculate_ndvi(original_stream.array, ir_stream.array)
             ndvi = self._stretch_contrast(ndvi, in_min=-1, in_max=1)
-            cv2.imwrite("/home/pi/images/ndvi.png", ndvi, [cv2.IMWRITE_PNG_COMPRESSION, 8])
+            cv2.imwrite("/home/pi/images/ndvi.png", ndvi, [cv2.IMWRITE_PNG_COMPRESSION, 6])
             cm = ndvi.astype(numpy.uint8)
 
             # add minimum/maximum pixel to force full color range
             cm[0, 0] = 0
             cm[0, 1] = 255
             colormapped = cv2.applyColorMap(cm, cmapy.cmap("viridis"))
-            cv2.imwrite("/home/pi/images/colormapped.png", colormapped, [cv2.IMWRITE_PNG_COMPRESSION, 8])
+            cv2.imwrite("/home/pi/images/colormapped.png", colormapped, [cv2.IMWRITE_PNG_COMPRESSION, 6])
 
             return ndvi
 

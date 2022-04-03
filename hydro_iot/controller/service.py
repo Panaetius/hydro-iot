@@ -1,4 +1,6 @@
 import asyncio
+from datetime import datetime, timedelta
+from tzlocal import get_localzone
 
 import cysystemd.daemon as daemon
 import inject
@@ -46,28 +48,34 @@ def start_service(
     logging.info("Starting up ...")
 
     logging.info("Setting up scheduler")
+    timezone = get_localzone()
+
     scheduler.repeat_job_at_interval(
         func=read_temperature,
         seconds=config.timings.check_temperature_interval_ms / 1000.0,
         id="check_temperature",
+        start_date=datetime.now(timezone) + timedelta(seconds=10)
     )
 
     scheduler.repeat_job_at_interval(
         func=read_ph_conductivity,
         seconds=config.timings.check_ph_ec_interval_ms / 1000.0,
         id="check_ph_ec",
+        start_date=datetime.now(timezone) + timedelta(seconds=30)
     )
 
     scheduler.repeat_job_at_interval(
         func=spray_boxes,
         seconds=config.timings.spray_box_interval_ms / 1000.0,
         id="spray_boxes",
+        start_date=datetime.now(timezone) + timedelta(seconds=45)
     )
 
     scheduler.repeat_job_at_interval(
         func=read_pressure,
         seconds=config.timings.check_pressure_interval_ms / 1000.0,
         id="read_pressure",
+        start_date=datetime.now(timezone) + timedelta(seconds=5)
     )
 
     scheduler.repeat_job_at_interval(
