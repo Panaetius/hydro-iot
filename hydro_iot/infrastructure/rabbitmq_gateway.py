@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from functools import wraps
 from threading import Lock, Thread
 from typing import Callable
 
@@ -20,15 +21,42 @@ from hydro_iot.services.ports.message_queue import (
 )
 
 
+def reconnect_on_failure(func):
+    @wraps(func)
+    def _reconnect_on_failure(self: "RabbitMQGateway", *args, **kwargs):
+        try:
+            func(self, *args, **kwargs)
+        except pika.exceptions.AMQPConnectionError:
+            locked = self.connect_lock.acquire(False)
+            try:
+                if locked:
+                    self._connect_publish()
+                else:
+                    raise
+            finally:
+                if locked:
+                    self.connect_lock.release()
+            func(self, *args, **kwargs)
+
+    return _reconnect_on_failure
+
+
 class RabbitMQGateway(IMessageQueuePublisher):
     config: IConfig = inject.attr(IConfig)
     logging: ILogging = inject.attr(ILogging)
     subscriber: IMessageQueueSubscriber = inject.attr(IMessageQueueSubscriber)
     publish_lock: Lock = Lock()
+    connect_lock: Lock = Lock()
 
     def __init__(self) -> None:
         self.logging.info("Setting up message queues")
 
+        self._connect_publish()
+
+        self.logging.info("Start consuming rpc channel")
+        Thread(target=self.__consume_data_channel).start()
+
+    def _connect_publish(self):
         self.sensor_data_channel = None
         self.event_data_channel = None
 
@@ -48,8 +76,6 @@ class RabbitMQGateway(IMessageQueuePublisher):
 
         self.sensor_data_channel.queue_declare(queue="sensor_data")
         self.event_data_channel.queue_declare(queue="event_data")
-        self.logging.info("Start consuming rpc channel")
-        Thread(target=self.__consume_data_channel).start()
 
     def __consume_data_channel(self):
         while True:
@@ -91,6 +117,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
     def current_timestamp(self):
         return int(datetime.timestamp(datetime.utcnow()))
 
+    @reconnect_on_failure
     def send_temperature_status(self, temperature: WaterTemperature):
         if not self.sensor_data_channel:
             return
@@ -104,6 +131,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 mandatory=True,
             )
 
+    @reconnect_on_failure
     def send_ph_value(self, ph: PH):
         if not self.sensor_data_channel:
             return
@@ -117,6 +145,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 mandatory=True,
             )
 
+    @reconnect_on_failure
     def send_fertilizer_level(self, ec: Conductivity):
         if not self.sensor_data_channel:
             return
@@ -130,6 +159,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 mandatory=True,
             )
 
+    @reconnect_on_failure
     def send_pressure_status(self, pressure: Pressure):
         if not self.sensor_data_channel:
             return
@@ -143,6 +173,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 mandatory=True,
             )
 
+    @reconnect_on_failure
     def send_spray_message(self, index: int, duration: int):
         if not self.event_data_channel:
             return
@@ -156,6 +187,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 mandatory=True,
             )
 
+    @reconnect_on_failure
     def send_ph_raised(self, amount: float):
         if not self.event_data_channel:
             return
@@ -169,6 +201,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 mandatory=True,
             )
 
+    @reconnect_on_failure
     def send_ph_lowered(self, amount: float):
         if not self.event_data_channel:
             return
@@ -182,6 +215,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 mandatory=True,
             )
 
+    @reconnect_on_failure
     def send_ec_lowered(self, amount: float):
         if not self.event_data_channel:
             return
@@ -195,6 +229,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 mandatory=True,
             )
 
+    @reconnect_on_failure
     def send_ec_increased(self, amount_grow: float, amount_micro: float, amount_bloom: float):
         if not self.event_data_channel:
             return
@@ -210,6 +245,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 mandatory=True,
             )
 
+    @reconnect_on_failure
     def send_pressure_raised(self, pressure: Pressure):
         if not self.event_data_channel:
             return
@@ -223,6 +259,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 mandatory=True,
             )
 
+    @reconnect_on_failure
     def send_unexpected_pressure_drop(self, pressure_drop: float):
         if not self.event_data_channel:
             return
@@ -236,6 +273,7 @@ class RabbitMQGateway(IMessageQueuePublisher):
                 mandatory=True,
             )
 
+    @reconnect_on_failure
     def send_could_not_raise_pressure(self):
         if not self.event_data_channel:
             return

@@ -128,7 +128,7 @@ class ControlScreen(Screen):
 
             App.get_running_app().root.ids.sm.get_screen("values").send_rpc_request(
                 "set_spray_timing",
-                json.dumps({"duration": self.spray_duration, "interval": self.spray_interval * (60 * 1000)}),
+                json.dumps({"duration": self.spray_duration, "interval": int(self.spray_interval * 60 * 1000)}),
             )
         if self.min_ph != self.ids.ph_min.value:
             self.min_ph = self.ids.ph_min.value
@@ -386,13 +386,22 @@ class HydroApp(App):
         return HydroIoT()
 
     def on_stop(self):
-        App.get_running_app().root.ids.sm.get_screen("values").stop_mq_listener()
+        try:
+            App.get_running_app().root.ids.sm.get_screen("values").stop_mq_listener()
+        except:
+            pass
 
     def on_pause(self):
-        App.get_running_app().root.ids.sm.get_screen("values").stop_mq_listener()
+        try:
+            App.get_running_app().root.ids.sm.get_screen("values").stop_mq_listener()
+        except:
+            pass
 
     def on_resume(self):
-        App.get_running_app().root.ids.sm.get_screen("values").start_mq_listener()
+        try:
+            App.get_running_app().root.ids.sm.get_screen("values").start_mq_listener()
+        except:
+            pass
 
 
 def main():
