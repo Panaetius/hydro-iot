@@ -34,7 +34,7 @@ def read_ph_conductivity(
 
     logging.info("Sent ph ec status messages")
 
-    if monotonic() - system_state.last_fertilizer_ph_adjustment < config.timings.ph_ec_adjustment_downtime_ms:
+    if monotonic() - system_state.last_fertilizer_ph_adjustment < config.timings.ph_ec_adjustment_downtime_ms / 1000:
         return
 
     if ec.microsiemens_per_meter < config.levels.min_ec:
