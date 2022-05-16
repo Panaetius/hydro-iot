@@ -9,9 +9,11 @@ class Timings:
     check_pressure_interval_ms: int
     spray_box_interval_ms: int
     spray_box_timings_ms: List[int]
-    ph_ec_adjustment_downtime_ms: int
+    ec_adjustment_downtime_ms: int
+    ph_adjustment_downtime_ms: int
     minimum_pressure_error_wait_time_ms: int
     take_ndvi_image_interval_s: int
+    ec_pump_prime_threshold_s: int
 
 
 @dataclass

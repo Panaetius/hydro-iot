@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 import cysystemd.daemon as daemon
 import pika
 import pika.channel
+import pika.exceptions
 import psycopg2
 from dotenv import load_dotenv
 
@@ -104,20 +105,34 @@ def main():
             username=os.environ.get("RABBITMQ_USERNAME"), password=os.environ.get("RABBITMQ_PASSWORD")
         ),
     )
-    connection = pika.SelectConnection(parameters, on_open_callback=on_open)
 
-    try:
-        logging.info("Startup complete")
-        # Tell systemd that our service is ready
-        daemon.notify(daemon.Notification.READY)
+    while True:
+        try:
+            connection = pika.SelectConnection(parameters, on_open_callback=on_open)
+            logging.info("Startup complete")
+            # Tell systemd that our service is ready
+            daemon.notify(daemon.Notification.READY)
 
-        # Loop so we can communicate with RabbitMQ
-        connection.ioloop.start()
-    except KeyboardInterrupt:
-        # Gracefully close the connection
-        connection.close()
-        # Loop until we're fully closed, will stop on its own
-        connection.ioloop.start()
+            # Loop so we can communicate with RabbitMQ
+            logging.info("starting io loop")
+            connection.ioloop.start()
+        except KeyboardInterrupt:
+            # Gracefully close the connection
+            connection.close()
+            # Loop until we're fully closed, will stop on its own
+            connection.ioloop.start()
+            break
+        except pika.exceptions.ConnectionClosedByBroker:
+            logging.error("Connection was closed by broker, retrying...")
+            continue
+        # Do not recover on channel errors
+        except pika.exceptions.AMQPChannelError as err:
+            logging.error(f"Caught a channel error: {err}, stopping...")
+            break
+        # Recover on all other connection errors
+        except pika.exceptions.AMQPConnectionError:
+            logging.error("Connection was closed, retrying...")
+            continue
 
 
 if __name__ == "__main__":

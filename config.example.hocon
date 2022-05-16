@@ -8,9 +8,11 @@ timings {
         750,
         750
     ]
-    ph_ec_adjustment_downtime_ms = 1200000
+    ph_adjustment_downtime_ms = 1200000
+    ec_adjustment_downtime_ms = 1200000
     minimum_pressure_error_wait_time_ms = 60000
     take_ndvi_image_interval_s = 900
+    ec_pump_prime_threshold_s = 1209600
 }
 
 levels {

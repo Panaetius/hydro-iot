@@ -52,6 +52,15 @@ def increase_ec(
 ):
     if system_state.paused:
         return
+
+    if system_state.last_fertilizer_ph_adjustment - monotonic() > config.timings._s:
+        # Prime EC pumps as hoses probably dried up
+        pump_gateway.increase_fertilizer(
+            flora_grow_ml=5,
+            flora_micro_ml=5,
+            flora_bloom_ml=5,
+        )
+
     system_state.last_fertilizer_ph_adjustment = monotonic()
     pump_gateway.increase_fertilizer(
         flora_grow_ml=config.amounts.flora_grow_ml,

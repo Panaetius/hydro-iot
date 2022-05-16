@@ -16,7 +16,8 @@ def test_config():
         750,
         750
     ]
-    ph_ec_adjustment_downtime_ms = 1200000
+    ph_adjustment_downtime_ms = 1200000
+    ec_adjustment_downtime_ms = 1200000
 }
 
 levels {

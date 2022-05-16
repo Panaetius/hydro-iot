@@ -45,7 +45,7 @@ def test_high_ph(mocker, mock_sensor_gateway, test_config):
     event_hub.publish.assert_not_called()
 
     system_state = mocker.MagicMock(
-        last_fertilizer_ph_adjustment=monotonic() - test_config.timings.ph_ec_adjustment_downtime_ms - 1000
+        last_fertilizer_ph_adjustment=monotonic() - test_config.timings.ph_adjustment_downtime_ms - 1000
     )
     read_ph_conductivity(
         sensor_gateway=mock_sensor_gateway(ph=7.0, conductivity=1500),
@@ -77,7 +77,7 @@ def test_low_ph(mocker, mock_sensor_gateway, test_config):
     event_hub.publish.assert_not_called()
 
     system_state = mocker.MagicMock(
-        last_fertilizer_ph_adjustment=monotonic() - test_config.timings.ph_ec_adjustment_downtime_ms - 1000
+        last_fertilizer_ph_adjustment=monotonic() - test_config.timings.ph_adjustment_downtime_ms - 1000
     )
     read_ph_conductivity(
         sensor_gateway=mock_sensor_gateway(ph=5.0, conductivity=1500),
@@ -109,7 +109,7 @@ def test_low_ec(mocker, mock_sensor_gateway, test_config):
     event_hub.publish.assert_not_called()
 
     system_state = mocker.MagicMock(
-        last_fertilizer_ph_adjustment=monotonic() - test_config.timings.ph_ec_adjustment_downtime_ms - 1000
+        last_fertilizer_ph_adjustment=monotonic() - test_config.timings.ec_adjustment_downtime_ms - 1000
     )
     read_ph_conductivity(
         sensor_gateway=mock_sensor_gateway(ph=6.0, conductivity=500),
@@ -141,7 +141,7 @@ def test_high_ec(mocker, mock_sensor_gateway, test_config):
     event_hub.publish.assert_not_called()
 
     system_state = mocker.MagicMock(
-        last_fertilizer_ph_adjustment=monotonic() - test_config.timings.ph_ec_adjustment_downtime_ms - 1000
+        last_fertilizer_ph_adjustment=monotonic() - test_config.timings.ec_adjustment_downtime_ms - 1000
     )
     read_ph_conductivity(
         sensor_gateway=mock_sensor_gateway(ph=6.0, conductivity=2500),
@@ -173,7 +173,7 @@ def test_low_ec_and_ph(mocker, mock_sensor_gateway, test_config):
     event_hub.publish.assert_not_called()
 
     system_state = mocker.MagicMock(
-        last_fertilizer_ph_adjustment=monotonic() - test_config.timings.ph_ec_adjustment_downtime_ms - 1000
+        last_fertilizer_ph_adjustment=monotonic() - test_config.timings.ec_adjustment_downtime_ms - 1000
     )
     read_ph_conductivity(
         sensor_gateway=mock_sensor_gateway(ph=5.0, conductivity=500),
