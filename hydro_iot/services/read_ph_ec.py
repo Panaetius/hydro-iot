@@ -34,7 +34,7 @@ def read_ph_conductivity(
 
     logging.info("Sent ph ec status messages")
 
-    if monotonic() - system_state.last_fertilizer_ph_adjustment >= config.timings.ec_adjustment_downtime_ms / 1000:
+    if monotonic() - system_state.last_fertilizer_adjustment >= config.timings.ec_adjustment_downtime_ms / 1000:
         if ec.microsiemens_per_meter < config.levels.min_ec:
             logging.info("Increasing EC")
             event_hub.publish(key="ec.up", message="increase_ec")
@@ -44,7 +44,10 @@ def read_ph_conductivity(
             event_hub.publish(key="ec.down", message="decrease_ec")
             return
 
-    if monotonic() - system_state.last_fertilizer_ph_adjustment >= config.timings.ph_adjustment_downtime_ms / 1000:
+    if (
+        monotonic() - min(system_state.last_ph_adjustment, system_state.last_fertilizer_adjustment)
+        >= config.timings.ph_adjustment_downtime_ms / 1000
+    ):
         if ph.value < config.levels.min_ph:
             logging.info("Increasing PH")
             event_hub.publish(key="ph.up", message="increase_ph")

@@ -11,7 +11,8 @@ from hydro_iot.domain.temperature import WaterTemperature
 
 @dataclass
 class SystemState:
-    last_fertilizer_ph_adjustment: float
+    last_ph_adjustment: float
+    last_fertilizer_adjustment: float
     current_pressure_level: Optional[Pressure] = None
     increasing_pressure: bool = False
     spraying_boxes: bool = False

@@ -20,7 +20,7 @@ def increase_ph(
 ):
     if system_state.paused:
         return
-    system_state.last_fertilizer_ph_adjustment = monotonic()
+    system_state.last_ph_adjustment = monotonic()
     pump_gateway.raise_ph(config.amounts.ph_increase_ml)
     logging.info(f"Increased PH with {config.amounts.ph_increase_ml} ml solution")
     message_queue.send_ph_raised(amount=config.amounts.ph_increase_ml)
@@ -36,7 +36,7 @@ def decrease_ph(
 ):
     if system_state.paused:
         return
-    system_state.last_fertilizer_ph_adjustment = monotonic()
+    system_state.last_ph_adjustment = monotonic()
     pump_gateway.lower_ph(config.amounts.ph_decrease_ml)
     logging.info(f"Lowered PH with {config.amounts.ph_decrease_ml} ml solution")
     message_queue.send_ph_lowered(amount=config.amounts.ph_increase_ml)
@@ -53,7 +53,7 @@ def increase_ec(
     if system_state.paused:
         return
 
-    if system_state.last_fertilizer_ph_adjustment - monotonic() > config.timings._s:
+    if system_state.last_fertilizer_adjustment - monotonic() > config.timings.ec_pump_prime_threshold_s:
         # Prime EC pumps as hoses probably dried up
         pump_gateway.increase_fertilizer(
             flora_grow_ml=5,
@@ -61,7 +61,7 @@ def increase_ec(
             flora_bloom_ml=5,
         )
 
-    system_state.last_fertilizer_ph_adjustment = monotonic()
+    system_state.last_fertilizer_adjustment = monotonic()
     pump_gateway.increase_fertilizer(
         flora_grow_ml=config.amounts.flora_grow_ml,
         flora_micro_ml=config.amounts.flora_micro_ml,
@@ -87,7 +87,7 @@ def decrease_ec(
 ):
     if system_state.paused:
         return
-    system_state.last_fertilizer_ph_adjustment = monotonic()
+    system_state.last_fertilizer_adjustment = monotonic()
     pump_gateway.lower_fertilizer(amount_ml=config.amounts.fresh_water_ml)
     logging.info(f"Decreased EC by adding {config.amounts.fresh_water_ml} ml fresh water.")
     message_queue.send_ec_lowered(amount=config.amounts.fresh_water_ml)

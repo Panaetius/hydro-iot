@@ -18,6 +18,9 @@ def test_config():
     ]
     ph_adjustment_downtime_ms = 1200000
     ec_adjustment_downtime_ms = 1200000
+    minimum_pressure_error_wait_time_ms = 60000
+    take_ndvi_image_interval_s = 900
+    ec_pump_prime_threshold_s = 1209600
 }
 
 levels {
@@ -26,6 +29,13 @@ levels {
     max_ec = 1800
     min_ec = 1200
     minimum_pressure_bar = 6.0
+    maximum_pressure_bar = 8.5
+    pressure_drop_error_threshold = 0.25
+    boxes_enabled = [
+        true,
+        true,
+        true
+    ],
 }
 
 amounts {
@@ -40,6 +50,8 @@ amounts {
 message_queue_connection {
     host = localhost
     port = 1234
+    user = john
+    password = doe
 }
 
 pins {
@@ -60,6 +72,7 @@ pins {
         13,
         16
     ]
+    camera_ir_filter_pin = 2
 }
 """
     return dataconf.string(config, Config)
