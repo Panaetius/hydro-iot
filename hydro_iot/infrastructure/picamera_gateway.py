@@ -53,28 +53,28 @@ class PiCameraGateway(ICameraGateway):
     def take_ndvi_picture(self) -> numpy.ndarray:
         camera = picamera.PiCamera()
         camera.resolution = (2560, 1920)
-        # camera.iso = 100
+        camera.iso = 100
         try:
+            sleep(2)
+            camera.awb_mode = "auto"
+            camera.shutter_speed = camera.exposure_speed
+            camera.exposure_mode = "off"
+            # Get IR image
+            ir_stream = picamera.array.PiRGBArray(camera)
+            camera.capture(ir_stream, format="bgr", use_video_port=True)
+            # contrasted = self._stretch_contrast(original_stream.array)
+            # cv2.imwrite("/home/pi/images/contrasted.png", contrasted)
+            gains = camera.awb_gains
+            camera.awb_mode = "off"
+            camera.awb_gains = gains
+
+            # Get non-IR image
             with self.system_state.power_output_lock:
                 GPIO.output(self.config.pins.camera_ir_filter_pin, GPIO.HIGH)
                 sleep(3)
-                # gains = camera.awb_gains
-                # camera.shutter_speed = camera.exposure_speed
-                # camera.exposure_mode = "off"
-                camera.awb_mode = "off"
-                camera.awb_gains = self.custom_gains
-                # Get non-IR image
                 original_stream = picamera.array.PiRGBArray(camera)
                 camera.capture(original_stream, format="bgr", use_video_port=True)
-                # contrasted = self._stretch_contrast(original_stream.array)
-                # cv2.imwrite("/home/pi/images/contrasted.png", contrasted)
-
-                # Get IR image
                 GPIO.output(self.config.pins.camera_ir_filter_pin, GPIO.LOW)
-            sleep(3)
-            ir_stream = picamera.array.PiRGBArray(camera)
-            camera.capture(ir_stream, format="bgr", use_video_port=True)
-            GPIO.output(self.config.pins.camera_ir_filter_pin, GPIO.LOW)
 
             cv2.imwrite("/home/pi/images/ir.png", ir_stream.array, [cv2.IMWRITE_PNG_COMPRESSION, 6])
             cv2.imwrite("/home/pi/images/original.png", original_stream.array, [cv2.IMWRITE_PNG_COMPRESSION, 6])
